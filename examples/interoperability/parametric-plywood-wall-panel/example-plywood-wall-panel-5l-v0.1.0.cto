@@ -1,0 +1,303 @@
+{
+  "cto_version": "0.3.0",
+  "cto_type": "element",
+  "element_meta": {
+    "id": "example-plywood-wall-panel-5l",
+    "name": "Example Mass Plywood Wall Panel, 5 layers (5.10 in.), cut to size",
+    "category": "wall_panel",
+    "subcategory": "solid",
+    "product_version": "0.1.0",
+    "status": "draft",
+    "created_at": "2026-10-06T00:00:00Z",
+    "modified_at": "2026-10-06T00:00:00Z",
+    "manufacturer": {
+      "name": "Example Panel Co.",
+      "website": "https://example.com",
+      "contact": {
+        "name": "Fixture Maintainer",
+        "email": "maintainer@example.com",
+        "role": "synthetic example maintainer"
+      }
+    },
+    "description": "Synthetic element for testing parametric products (spec §5.8). A solid mass plywood wall panel cut to size within the manufacturer's limits, at one fixed thickness. The thickness and billet limits follow a five-layer mass plywood layup listed in the public evaluation report ICC-ES ESR-4760; the manufacturer, interface, rules, density, lift capacities and price are invented. It is not a manufacturer's product declaration and carries no engineering, fabrication, commercial or certification claim.",
+    "notes": "Rectangular cuts only. Openings are not parameters in this example."
+  },
+  "declares_interface": [
+    {
+      "cis_id": "EXAMPLE-INT-PLY-PLY",
+      "cis_version": "0.1.0",
+      "cis_registry_url": null,
+      "scope": "panel_to_panel",
+      "registry_scope": "catalog_internal",
+      "description": "Both vertical edges take the synthetic panel-edge interface, so panels stand side by side in a wall line."
+    }
+  ],
+  "parameters": {
+    "description": "One mass plywood panel layup, cut to any rectangle within the limits below and used as a wall panel. Thickness is fixed: a different thickness is a different product. The numbers elsewhere in this file describe the panel at its reference size, the defaults below (a full billet).",
+    "label_template": "Example Mass Plywood Wall Panel, 5 layers (5.10 in.), {width_in} in. x {height_in} in.",
+    "inputs": [
+      {
+        "name": "width_in",
+        "label": "Panel width",
+        "unit": "in",
+        "min": 12.0,
+        "max": 142.0,
+        "step": 0.0625,
+        "default": 142.0,
+        "description": "Across the panel, perpendicular to the strong axis. Product-local X. The maximum is the net width of the widest billet; the minimum is a synthetic handling limit."
+      },
+      {
+        "name": "height_in",
+        "label": "Panel height",
+        "unit": "in",
+        "min": 12.0,
+        "max": 576.0,
+        "step": 0.0625,
+        "default": 576.0,
+        "description": "Along the strong axis, which stands vertical in a wall. Product-local Y. The maximum is the longest billet."
+      }
+    ],
+    "constants": {
+      "thickness_in": 5.1,
+      "density_pcf": 35.0,
+      "legal_width_in": 102.0,
+      "max_slenderness": 20.0,
+      "unit_rate_usd_per_cf": 100.0
+    },
+    "derived": [
+      {
+        "name": "width_ft",
+        "expr": "width_in / 12"
+      },
+      {
+        "name": "height_ft",
+        "expr": "height_in / 12"
+      },
+      {
+        "name": "thickness_ft",
+        "expr": "thickness_in / 12"
+      },
+      {
+        "name": "area_sf",
+        "expr": "width_ft * height_ft"
+      },
+      {
+        "name": "volume_cf",
+        "expr": "area_sf * thickness_ft"
+      },
+      {
+        "name": "weight_lbs",
+        "expr": "round(volume_cf * density_pcf)"
+      },
+      {
+        "name": "msrp_usd",
+        "expr": "round(volume_cf * unit_rate_usd_per_cf, 2)"
+      }
+    ],
+    "rules": [
+      {
+        "id": "R-SHIP-WIDTH",
+        "severity": "warning",
+        "expr": "min(width_in, height_in) <= legal_width_in",
+        "message": "Both dimensions exceed 8 ft 6 in., so the panel ships as an oversize load. It can still be ordered; the freight quote changes."
+      },
+      {
+        "id": "R-SLENDER",
+        "severity": "error",
+        "expr": "height_in <= max_slenderness * width_in",
+        "message": "The panel is more than 20 times taller than it is wide. Synthetic handling limit for this example: too slender to lift and ship without damage."
+      }
+    ],
+    "bindings": [
+      {
+        "target": "/geometry/nominal_dimensions/width_ft",
+        "expr": "round(width_ft, 4)"
+      },
+      {
+        "target": "/geometry/bounding_box/width_ft",
+        "expr": "round(width_ft, 4)"
+      },
+      {
+        "target": "/geometry/bounding_box/height_ft",
+        "expr": "round(height_ft, 4)"
+      },
+      {
+        "target": "/geometry/bounding_box/weight_lbs",
+        "expr": "weight_lbs"
+      },
+      {
+        "target": "/geometry/bounding_box/max/x",
+        "expr": "round(width_ft, 4)"
+      },
+      {
+        "target": "/geometry/bounding_box/max/y",
+        "expr": "round(height_ft, 4)"
+      },
+      {
+        "target": "/geometry/center_of_gravity/x_ft",
+        "expr": "round(width_ft / 2, 4)"
+      },
+      {
+        "target": "/geometry/center_of_gravity/y_ft",
+        "expr": "round(height_ft / 2, 4)"
+      },
+      {
+        "target": "/connectivity/connection_points/@cp-edge-left/position_ft/y",
+        "expr": "round(height_ft / 2, 4)"
+      },
+      {
+        "target": "/connectivity/connection_points/@cp-edge-right/position_ft/x",
+        "expr": "round(width_ft, 4)"
+      },
+      {
+        "target": "/connectivity/connection_points/@cp-edge-right/position_ft/y",
+        "expr": "round(height_ft / 2, 4)"
+      },
+      {
+        "target": "/rigging/lift_points/@lp-1/position_ft/x",
+        "expr": "round(width_ft / 4, 4)"
+      },
+      {
+        "target": "/rigging/lift_points/@lp-1/position_ft/y",
+        "expr": "round(height_ft, 4)"
+      },
+      {
+        "target": "/rigging/lift_points/@lp-2/position_ft/x",
+        "expr": "round(3 * width_ft / 4, 4)"
+      },
+      {
+        "target": "/rigging/lift_points/@lp-2/position_ft/y",
+        "expr": "round(height_ft, 4)"
+      },
+      {
+        "target": "/pricing/base_msrp",
+        "expr": "msrp_usd"
+      }
+    ]
+  },
+  "catalog_reference": {
+    "manufacturer": "Example Panel Co.",
+    "manufacturer_website": "https://example.com",
+    "catalog_id": "example-parametric-panel-catalog",
+    "catalog_edition": "Parametric Products Fixture",
+    "catalog_version": "0.1.0",
+    "interface_standards": [
+      {
+        "standard_id": "EXAMPLE-INT-PLY-PLY",
+        "version": "0.1.0",
+        "scope": "panel_to_panel"
+      }
+    ]
+  },
+  "geometry": {
+    "nominal_dimensions": {
+      "width_ft": 11.8333,
+      "length_ft": 0.425,
+      "description": "Plan footprint the configurator reserves: panel width along X by panel thickness along Z. Width is bound to the parameters; thickness is fixed."
+    },
+    "bounding_box": {
+      "width_ft": 11.8333,
+      "length_ft": 0.425,
+      "height_ft": 48,
+      "weight_lbs": 8449,
+      "min": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "max": {
+        "x": 11.8333,
+        "y": 48,
+        "z": 0.425
+      },
+      "description": "Shipping envelope in product-local feet, origin at the SWB corner: width along X, height along Y, thickness along Z. Width, height and weight are bound to the parameters; the extents appear twice (width_ft and max.x) and both are bound."
+    },
+    "chase_zones": [],
+    "opening_geometry": null,
+    "center_of_gravity": {
+      "x_ft": 5.9167,
+      "y_ft": 24,
+      "z_ft": 0.2125
+    },
+    "clearance_zones": [],
+    "model_glb_url": null
+  },
+  "connectivity": {
+    "interface_roles": [
+      {
+        "cis_id": "EXAMPLE-INT-PLY-PLY",
+        "cis_version": "0.1.0",
+        "cis_registry_url": null,
+        "face": "right",
+        "side_addressed": "side_a",
+        "description": "The right edge addresses side_a. It moves as the panel gets wider; the face it is on, and the standard it meets, do not change."
+      },
+      {
+        "cis_id": "EXAMPLE-INT-PLY-PLY",
+        "cis_version": "0.1.0",
+        "cis_registry_url": null,
+        "face": "left",
+        "side_addressed": "side_b",
+        "description": "The left edge addresses side_b. It is on the origin face, so its X never changes."
+      }
+    ],
+    "connection_points": [
+      {
+        "id": "cp-edge-left",
+        "face": "left",
+        "position_ft": {
+          "x": 0,
+          "y": 24,
+          "z": 0.2125
+        },
+        "cis_id_ref": "EXAMPLE-INT-PLY-PLY",
+        "cis_version_ref": "0.1.0",
+        "cis_port_id_ref": "edge_contact",
+        "description": "Mid-height of the left edge. Y is bound to the height."
+      },
+      {
+        "id": "cp-edge-right",
+        "face": "right",
+        "position_ft": {
+          "x": 11.8333,
+          "y": 24,
+          "z": 0.2125
+        },
+        "cis_id_ref": "EXAMPLE-INT-PLY-PLY",
+        "cis_version_ref": "0.1.0",
+        "cis_port_id_ref": "edge_contact",
+        "description": "Mid-height of the right edge. X is bound to the width and Y to the height."
+      }
+    ]
+  },
+  "constraints": {
+    "permitted_orientation": "vertical"
+  },
+  "rigging": {
+    "lift_points": [
+      {
+        "id": "lp-1",
+        "position_ft": {
+          "x": 2.9583,
+          "y": 48,
+          "z": 0.2125
+        },
+        "capacity_lbs": 6000
+      },
+      {
+        "id": "lp-2",
+        "position_ft": {
+          "x": 8.875,
+          "y": 48,
+          "z": 0.2125
+        },
+        "capacity_lbs": 6000
+      }
+    ],
+    "spreader_bar_required": false
+  },
+  "pricing": {
+    "base_msrp": 24140,
+    "lead_time_days": 28
+  }
+}

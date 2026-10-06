@@ -1,0 +1,160 @@
+{
+  "cto_version": "0.2.0",
+  "cto_type": "element",
+  "element_meta": {
+    "id": "example-plywood-wall-panel-5l",
+    "name": "Example Mass Plywood Wall Panel, 5 layers (5.10 in.), 46 in. x 96 in.",
+    "category": "wall_panel",
+    "subcategory": "solid",
+    "product_version": "0.1.0",
+    "status": "draft",
+    "created_at": "2026-10-06T00:00:00Z",
+    "modified_at": "2026-10-06T00:00:00Z",
+    "manufacturer": {
+      "name": "Example Panel Co.",
+      "website": "https://example.com",
+      "contact": {
+        "name": "Fixture Maintainer",
+        "email": "maintainer@example.com",
+        "role": "synthetic example maintainer"
+      }
+    },
+    "description": "Synthetic element for testing parametric products (spec §5.8). A solid mass plywood wall panel cut to size within the manufacturer's limits, at one fixed thickness. The thickness and billet limits follow a five-layer mass plywood layup listed in the public evaluation report ICC-ES ESR-4760; the manufacturer, interface, rules, density, lift capacities and price are invented. It is not a manufacturer's product declaration and carries no engineering, fabrication, commercial or certification claim.",
+    "notes": "Rectangular cuts only. Openings are not parameters in this example."
+  },
+  "declares_interface": [
+    {
+      "cis_id": "EXAMPLE-INT-PLY-PLY",
+      "cis_version": "0.1.0",
+      "cis_registry_url": null,
+      "scope": "panel_to_panel",
+      "registry_scope": "catalog_internal",
+      "description": "Both vertical edges take the synthetic panel-edge interface, so panels stand side by side in a wall line."
+    }
+  ],
+  "catalog_reference": {
+    "manufacturer": "Example Panel Co.",
+    "manufacturer_website": "https://example.com",
+    "catalog_id": "example-parametric-panel-catalog",
+    "catalog_edition": "Parametric Products Fixture",
+    "catalog_version": "0.1.0",
+    "interface_standards": [
+      {
+        "standard_id": "EXAMPLE-INT-PLY-PLY",
+        "version": "0.1.0",
+        "scope": "panel_to_panel"
+      }
+    ]
+  },
+  "geometry": {
+    "nominal_dimensions": {
+      "width_ft": 3.8333,
+      "length_ft": 0.425,
+      "description": "Plan footprint the configurator reserves: panel width along X by panel thickness along Z. Width is bound to the parameters; thickness is fixed."
+    },
+    "bounding_box": {
+      "width_ft": 3.8333,
+      "length_ft": 0.425,
+      "height_ft": 8,
+      "weight_lbs": 456,
+      "min": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "max": {
+        "x": 3.8333,
+        "y": 8,
+        "z": 0.425
+      },
+      "description": "Shipping envelope in product-local feet, origin at the SWB corner: width along X, height along Y, thickness along Z. Width, height and weight are bound to the parameters; the extents appear twice (width_ft and max.x) and both are bound."
+    },
+    "chase_zones": [],
+    "opening_geometry": null,
+    "center_of_gravity": {
+      "x_ft": 1.9167,
+      "y_ft": 4,
+      "z_ft": 0.2125
+    },
+    "clearance_zones": [],
+    "model_glb_url": null
+  },
+  "connectivity": {
+    "interface_roles": [
+      {
+        "cis_id": "EXAMPLE-INT-PLY-PLY",
+        "cis_version": "0.1.0",
+        "cis_registry_url": null,
+        "face": "right",
+        "side_addressed": "side_a",
+        "description": "The right edge addresses side_a. It moves as the panel gets wider; the face it is on, and the standard it meets, do not change."
+      },
+      {
+        "cis_id": "EXAMPLE-INT-PLY-PLY",
+        "cis_version": "0.1.0",
+        "cis_registry_url": null,
+        "face": "left",
+        "side_addressed": "side_b",
+        "description": "The left edge addresses side_b. It is on the origin face, so its X never changes."
+      }
+    ],
+    "connection_points": [
+      {
+        "id": "cp-edge-left",
+        "face": "left",
+        "position_ft": {
+          "x": 0,
+          "y": 4,
+          "z": 0.2125
+        },
+        "cis_id_ref": "EXAMPLE-INT-PLY-PLY",
+        "cis_version_ref": "0.1.0",
+        "cis_port_id_ref": "edge_contact",
+        "description": "Mid-height of the left edge. Y is bound to the height."
+      },
+      {
+        "id": "cp-edge-right",
+        "face": "right",
+        "position_ft": {
+          "x": 3.8333,
+          "y": 4,
+          "z": 0.2125
+        },
+        "cis_id_ref": "EXAMPLE-INT-PLY-PLY",
+        "cis_version_ref": "0.1.0",
+        "cis_port_id_ref": "edge_contact",
+        "description": "Mid-height of the right edge. X is bound to the width and Y to the height."
+      }
+    ]
+  },
+  "constraints": {
+    "permitted_orientation": "vertical"
+  },
+  "rigging": {
+    "lift_points": [
+      {
+        "id": "lp-1",
+        "position_ft": {
+          "x": 0.9583,
+          "y": 8,
+          "z": 0.2125
+        },
+        "capacity_lbs": 6000
+      },
+      {
+        "id": "lp-2",
+        "position_ft": {
+          "x": 2.875,
+          "y": 8,
+          "z": 0.2125
+        },
+        "capacity_lbs": 6000
+      }
+    ],
+    "spreader_bar_required": false
+  },
+  "pricing": {
+    "base_msrp": 1303.33,
+    "lead_time_days": 28
+  }
+}

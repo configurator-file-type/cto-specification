@@ -93,6 +93,10 @@ This specification covers:
 | **SWB Origin** | South-West-Bottom origin. The mandatory registration point for all product geometry files. The south-west corner of the product base is placed at world coordinates `[0, 0, 0]`. Product depth grows along the negative Z-axis. Height grows along the positive Y-axis (GLB/web convention) |
 | **Product-Local Face Labels** | The labels `front`, `back`, `left`, `right`, `top`, `bottom` used in product geometry refer to faces of the product as oriented at SWB origin with no rotation. They are NOT real-world compass directions. A product placed in an assembly may be rotated such that its `front` face points west; the label `front` is preserved as a property of the product, not the placement |
 | **Connection Plane** (also see above) | Sides of a connection plane belong to the CIS file. A product's face *addresses* a side by reaching toward the plane from that side. See §5.7 and the CIS spec §2.2 |
+| **Parametric Product** | A catalog product whose size may be chosen within limits declared by the manufacturer, using a `parameters` block (§5.8). It is one product, with one `id`, at every permitted size |
+| **Size Parameter** | A named dimension of a parametric product that a designer may set, for example `width_in`, with a minimum, maximum, step and default (§5.8.2) |
+| **Reference Size** | The size a parametric product has when every parameter is at its default. All literal values in a parametric element file describe the product at its reference size (§5.8.3) |
+| **Configured Item** | A parametric product at specific parameter values, identified by its configured item key (§5.8.7). The configured item, not the product, is what is priced, manufactured, shipped and tracked |
 
 ### 1.4 Notational Conventions
 
@@ -139,21 +143,31 @@ The CIS specification is normative for any CIS file referenced by a CTO file; co
 
 A CTO file does not describe arbitrary geometry. Every element in a configuration MUST reference a `product_id` that exists in a known catalog. The catalog — not the designer — defines what is possible. This is the foundational principle of Configure-to-Order: **design as purchasing, not drafting**.
 
+A parametric product (§5.8) remains catalog-constrained. The manufacturer declares which dimensions may change, the limits, and the step; the designer chooses only within them. A bounded, stepped range declared by the manufacturer is a catalog definition, in the same way `constraints.pitch_range` (§5.5) is.
+
 ### 2.2 Cartridge-Driven Grids
 
 The structural grid is derived from floor cartridge placement, not defined independently. Valid grid configurations are those for which a complete floor cartridge assembly exists. The grid is an output of product placement, not an input to design.
+
+Where floor cartridges are parametric, the grid is derived from their *resolved* sizes (§5.8.7).
 
 ### 2.3 Pre-Validated Connections
 
 Products declare their connection points and the interface standards to which they conform. A valid configuration is one in which all connections are satisfied according to product constraints and interface compatibility. Invalid configurations MUST NOT be savable as `.cto` files.
 
+For a parametric product, "pre-validated" means validated across its **entire** declared range, not at one size. By publishing limits, the manufacturer represents that every permitted size is manufacturable, conforms to the declared interfaces, and is covered by the product's certifications. Where structural or code performance varies with size, the manufacturer MUST either narrow the limits or express the dependency as a rule (§5.8.4) so that sizes outside the engineered envelope cannot be saved.
+
 ### 2.4 Price Transparency
 
 Every product carries an MSRP. A configuration's total price is deterministically calculable from its composition. Options and upgrades add to the base price in a predictable manner.
 
+A parametric product's MSRP MAY be an expression of its parameters (§5.8), so the price of a configured item remains deterministically calculable.
+
 ### 2.5 Self-Describing
 
 A CTO file contains all metadata necessary for a conforming parser to render, validate, and price the configuration without external dependencies (beyond the referenced catalog and any referenced CIS files).
+
+This is why a parametric product states *how* every size-dependent value is computed (bindings, §5.8.5) rather than leaving it to the configurator. Two conforming parsers MUST produce the same weight, port positions and price for the same configured item.
 
 ### 2.6 End-to-End Traceability
 
@@ -198,6 +212,7 @@ A CTO file is a JSON object with the following top-level keys. Which keys are pr
   "project_meta": { },
   "element_meta": { },
   "declares_interface": [ ],
+  "parameters": { },
   "catalog_reference": { },
   "structural_grid": { },
   "floor_levels": [ ],
@@ -218,7 +233,7 @@ A CTO file is a JSON object with the following top-level keys. Which keys are pr
 **By `cto_type`:**
 
 - `assembly` files use `project_meta`, `catalog_reference`, the placement-related keys, and `pricing_snapshot` / `fulfillment_plan` / `validation_state`. They do NOT use `element_meta` or `declares_interface`.
-- `element` files use `element_meta`, `declares_interface`, `catalog_reference`, and the geometry / connectivity / constraints sections of the Product Library Schema (§5). They do NOT use the placement-related keys (`placed_elements`, `floor_cartridges`, etc.) or `fulfillment_plan`.
+- `element` files use `element_meta`, `declares_interface`, `catalog_reference`, and the geometry / connectivity / constraints sections of the Product Library Schema (§5). They do NOT use the placement-related keys (`placed_elements`, `floor_cartridges`, etc.) or `fulfillment_plan`. An `element` file MAY also carry a `parameters` block (§5.8). No other file type carries it; assembly and template files record the chosen values on each placed instance (`parameter_values`, §4.5 to §4.7).
 - `template` files use the same keys as `assembly` files plus `is_template: true` in `project_meta`.
 - `entourage` files use `entourage_meta` (§4.4c) and `sub_elements`.
 
@@ -295,6 +310,8 @@ The `element_meta` block carries metadata for `cto_type: "element"` files. It is
 | `manufacturer` | object | Yes | Manufacturer party block per §4.3a |
 | `description` | string | Yes | Prose description of the product, including counterintuitive scope notes per §2.8 |
 | `notes` | string | No | Free-form notes |
+
+A parametric product has a single `id` for every permitted size. Sizes are not separate products and MUST NOT be given separate ids. A specific size is identified by its configured item key (§5.8.7).
 
 ### 4.2a `declares_interface` (REQUIRED for element files)
 
@@ -739,6 +756,8 @@ The `conceptual_objects` array with `type: "stairwell_volume"` (introduced in v0
 | `allow_shortened_cartridges` | boolean | Yes | If true, floor cartridges adjacent to the stairwell may be trimmed to dead-end against the volume |
 | `min_cartridge_stub_ft` | decimal | No | Minimum length of a shortened floor cartridge stub (prevents structural instability). Default: 2.0 ft |
 
+A shortened floor cartridge can be recorded as a parametric floor cartridge (§5.8): the same product with its length parameter set. `min_cartridge_stub_ft` SHOULD NOT be smaller than the product's own minimum for that parameter; where it is, the product's minimum governs.
+
 ### 4.4e `level_datums` — Level Datum Architecture
 
 In v0.1.6, levels are elevated from an organizational convenience (`floor_levels`) to a first-class abstract hosting system. The `level_datums` array defines the vertical datum planes to which all elements are hosted. Levels are independent of floor plates — a level exists as an abstract plane whether or not floor cartridges have been placed on it.
@@ -817,6 +836,8 @@ Level Datum
 | `auto_derived` | boolean | Yes | If true, `z_origin_ft` was calculated from the datum below |
 | `derived_from` | object | No | Derivation formula when `auto_derived: true` |
 | `roof_prism` | string | No | Reference to a `roof_prism` instance_id. Only valid for `type: "roof"` |
+
+Where a floor cartridge's thickness is a parameter, `derived_from.cartridge_thickness_ft` MUST be the *resolved* thickness of the cartridges on that datum, and auto-derived datums change when it changes. Manufacturers SHOULD keep thickness fixed per product (§5.8.1) to avoid this coupling.
 
 #### Relationship to `floor_levels`
 
@@ -900,6 +921,8 @@ Roof panels referenced in `slope_left.hosted_panels` and `slope_right.hosted_pan
 3. Have a declared `fixed_pitch` or `pitch_range` compatible with the slope's pitch
 4. Not extend beyond the ridge line or past the maximum overhang distance from the eave
 
+Check 4 uses the roof panel's *resolved* size (§5.8.7). Size parameters describe rectangles only, so the triangular gable-end panels described below are not parametric (§5.8.9).
+
 #### Relationship to `roof_elements`
 
 The `roof_elements` array (Section 4.7) continues to hold the individual roof panel instances. The roof prism provides the geometric context that determines where and at what angle those panels are placed. Think of the prism as the "datum surface" and the panels as the "hosted elements."
@@ -972,6 +995,9 @@ Gable end triangles — the triangular wall area above the top plate at each end
 | `requires_mid_support` | boolean | Yes | Whether this cartridge needs intermediate support |
 | `implied_supports` | array | Yes | Structural supports generated by this cartridge |
 | `instance_data` | object | No | Lifecycle data for this specific instance |
+| `parameter_values` | object | Conditional | Required when the product is parametric (§5.8). Name → value for every size parameter of the product, including those at their defaults (§5.8.7) |
+
+For a parametric cartridge, the grid cells it spans (`span_x`, `span_y`) MUST be the cells its resolved `nominal_dimensions` cover (§7.2).
 
 ### 4.6 `placed_elements` (REQUIRED)
 
@@ -1025,6 +1051,22 @@ Gable end triangles — the triangular wall area above the top plate at each end
 | `connections` | array | Yes | Connected elements with interface standard references |
 | `options` | object | No | Product options/upgrades |
 | `instance_data` | object | No | Lifecycle data for this specific instance |
+| `parameter_values` | object | Conditional | Required when the product is parametric (§5.8). Name → value for every size parameter of the product, including those at their defaults (§5.8.7) |
+
+A placed instance of a parametric product:
+
+```json
+{
+  "instance_id": "elem-014",
+  "component_display_id": "WP-014",
+  "product_id": "example-plywood-wall-panel-5l",
+  "category": "wall_panel",
+  "parameter_values": { "width_in": 94, "height_in": 120 },
+  "placement": { "method": "edge_anchor", "grid_anchor": { "x_index": 0, "y_index": 0 }, "edge": "south", "position_along_edge_ft": 0 },
+  "rotation_deg": 0,
+  "connections": []
+}
+```
 
 #### Placement Methods
 
@@ -1086,6 +1128,8 @@ Gable end triangles — the triangular wall area above the top plate at each end
 ]
 ```
 
+`roof_elements` instances of a parametric product MUST carry `parameter_values`, with the same meaning as in §4.6, and `spans_to` MUST agree with the resolved size: the size is set by `parameter_values`, and `spans_to` records where it lands on the grid.
+
 ### 4.8 `pricing_snapshot` (REQUIRED)
 
 ```json
@@ -1122,6 +1166,10 @@ Gable end triangles — the triangular wall area above the top plate at each end
   "pricing_valid_until": "2026-06-30"
 }
 ```
+
+For a parametric product, each line item carries two further fields: `parameter_values` and `configured_item_key` (§5.8.7). `unit_msrp` is the configured item's resolved price. A line item's `quantity` MAY exceed 1 only for instances with the same `configured_item_key`; two panels of the same product at different sizes are different line items.
+
+Where a configured item's resolved price is `null` (the product is priced by quote, §5.8.5), its line item carries `unit_msrp` `null`, and `total_msrp` is `null` rather than a partial sum.
 
 ### 4.9 `fulfillment_plan` (OPTIONAL)
 
@@ -1451,6 +1499,8 @@ The product schema is read by manufacturers writing element files, by parsers va
 }
 ```
 
+For a parametric product (§5.8), the values in `nominal_dimensions` and `bounding_box` remain literal numbers: the product's dimensions at its reference size. The dimensions that may change, and their limits, are declared once in the `parameters` block (§5.8.2), not in `bounding_box`, and the block binds every size-dependent field to them, including fields outside `geometry` such as connection point positions, lift points, weight and price (§5.8.8).
+
 ### 5.2 Category Values
 
 | Category | Description |
@@ -1502,6 +1552,8 @@ Wall panels with subcategory `window`, `door`, or `mixed` MUST include an `openi
 | `height_ft` | decimal | Yes | Opening height in feet |
 | `offset_x_ft` | decimal | Yes | Distance from left edge of panel to left edge of opening |
 | `offset_z_ft` | decimal | Yes | Distance from bottom of panel to bottom of opening. For doors, this is typically `0.0` |
+
+On a parametric wall panel, `offset_x_ft` and `offset_z_ft` are measured from the left and bottom edges and therefore stay fixed as the panel grows to the right and upward. A manufacturer that wants the opening to stay centred, or a fixed distance from the right edge, MUST bind the offset (for example `offset_x_ft` = `(width_ft - 3.0) / 2`). It MUST also add a rule keeping the opening inside the panel with the minimum edge distance the product's engineering requires. Opening *size* MAY be a parameter, subject to the same rules.
 
 ### 5.5 Permitted Orientation
 
@@ -1620,6 +1672,198 @@ A connection between two products is valid if and only if:
 5. Where an `interface_role` declares a `face`, the configurator's placement of the product orients that face toward the connection plane
 
 Failures of rules 1–4 are validation errors. Failures of rule 5 (rotation mismatch) are warnings per §5.7's rotation-lock framing.
+
+### 5.8 Parametric Products
+
+Most offsite products are made at one size. Many are not. A mass timber panel is cut to any rectangle from a billet; a glulam beam is cut to length; a floor cartridge is shortened to dead-end against a stairwell (§4.4d). Without parameters, each size is a separate product: a mass plywood panel cut on a 1/16 in. step from a 142 in. × 576 in. billet would need about 18.8 million element files per layup.
+
+A **parametric product** is one element file that describes every permitted size. It does so with an optional `parameters` block, a top-level key in an element file. The block says which dimensions a designer may set, the limits and step the manufacturer will make, and how every value that depends on size is computed.
+
+#### 5.8.1 What may be a parameter
+
+A size parameter changes **how big** a product is, never **what** it is. A dimension is a good parameter when, across its whole range, the product keeps:
+
+- the same layup, grade, materials and manufacturing process,
+- the same connection standards, on the same faces (`declares_interface`, `interface_roles`),
+- the same certifications and listings, and
+- engineering that the manufacturer can stand behind at every permitted value, directly or through rules (§5.8.4).
+
+A dimension that changes any of these is a different product. Panel *thickness* is usually one: for a mass timber panel it decides structural capacity, fastener lengths and which CIS envelopes fit, so each thickness is its own element file (see §10.4).
+
+#### 5.8.2 The `parameters` block
+
+```json
+"parameters": {
+  "description": "Prose: what varies and why.",
+  "label_template": "Example Mass Plywood Wall Panel, 5 layers (5.10 in.), {width_in} in. x {height_in} in.",
+  "inputs":    [ ],
+  "constants": { },
+  "derived":   [ ],
+  "rules":     [ ],
+  "bindings":  [ ]
+}
+```
+
+A parser reads the block in order. Inputs and constants form an environment; each derived value is added to it in turn; rules are checked against it; bindings write values from it into the rest of the file.
+
+**`inputs`**: the size parameters a designer may set.
+
+```json
+{
+  "name": "width_in",
+  "label": "Panel width",
+  "unit": "in",
+  "min": 12.0,
+  "max": 142.0,
+  "step": 0.0625,
+  "default": 142.0,
+  "description": "Across the panel, perpendicular to the strong axis. Product-local X."
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | identifier | Yes | Name used in expressions. Unique within the block. SHOULD end in its unit (`_in`, `_ft`) |
+| `label` | string | Yes | Short label for a configurator's user interface |
+| `unit` | enum | Yes | `in`, `ft`, `mm`, `m`, `deg`, `count` |
+| `min`, `max` | number | Yes | Inclusive limits. These are the manufacturer's limits, and the range over which the product is represented as pre-validated (§2.3) |
+| `step` | number | Yes | Valid values are `min + k × step` for whole numbers k ≥ 0. States real manufacturing resolution, such as a CNC cut increment or a lamination count |
+| `default` | number | Yes | The reference size (§5.8.3). MUST lie within the limits and on the step |
+| `description` | string | Yes | Which physical dimension this is, along which product-local axis, and why the limits are what they are (§2.8) |
+
+**`constants`**: an object of name → number or `null`, holding the product's fixed properties (thickness, density) and any rate not yet published. `null` propagates through expressions, so a file can carry a price formula before it carries a price.
+
+**`derived`**: an ordered array of named values, `{ "name": "volume_cf", "expr": "area_sf * thickness_ft" }`. Each may read inputs, constants and derived values *earlier in the array* only, so evaluation is a single pass with no cycles.
+
+**`label_template`**: optional. Produces `element_meta.name` for a resolved file by replacing each `{name}` with that value, written as in §5.8.7.
+
+#### 5.8.3 Reference size
+
+Every field that a binding writes MUST already hold, in the element file, the value that binding produces at the defaults.
+
+This is the rule that keeps parametric files compatible. A parser that does not understand `parameters` reads a complete, valid, truthful fixed-size product: the product at its reference size. It cannot offer other sizes, but it cannot be misled about the one it sees. Manufacturers SHOULD choose a reference size that is a real, commonly ordered product, such as a full billet.
+
+#### 5.8.4 Rules
+
+`min`, `max` and `step` limit one parameter at a time. Rules limit combinations:
+
+```json
+{
+  "id": "R-SHIP-WIDTH",
+  "severity": "warning",
+  "expr": "min(width_in, height_in) <= 102",
+  "message": "Both dimensions exceed 8 ft 6 in., so the panel ships as an oversize load."
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | string | Yes | Unique within the block |
+| `severity` | enum | Yes | `error`: the size is invalid and MUST NOT be saved (§2.3); `warning`; or `info` |
+| `expr` | expression | Yes | True when the size is acceptable |
+| `message` | string | Yes | What is wrong and why, for the designer |
+
+Rules are where size-dependent engineering limits belong: a maximum span for a given thickness, a maximum area, an aspect ratio, a minimum edge distance around an opening. A `warning` or `info` rule that evaluates to `null` is reported as not evaluated. An `error` rule that evaluates to `null` fails, because the size cannot be confirmed valid.
+
+#### 5.8.5 Bindings
+
+```json
+{ "target": "/connectivity/connection_points/@cp-edge-right/position_ft/x",
+  "expr": "round(width_ft, 4)" }
+```
+
+Each binding writes the value of `expr` into the field at `target`. Targets are JSON Pointers (RFC 6901) with one extension: an array segment written `@<id>` selects the array member whose `id` equals `<id>` (in `options[]`, whose members are identified by `option_id`, it matches `option_id`). This keeps targets readable and stable when arrays are reordered. Members of arrays without identifiers, such as `clearance_zones` and `point_loads`, are addressed by index as in plain JSON Pointer; manufacturers SHOULD NOT reorder those arrays between product versions.
+
+A binding target MUST already exist and hold a number or `null`. Bindings do not create fields or write text.
+
+**Protected fields.** A binding MUST NOT target `cto_version`, `cto_type`, `element_meta.id`, `element_meta.category`, `element_meta.manufacturer`, `declares_interface`, `connectivity.interface_roles`, `catalog_reference`, `parameters`, or any field named `id`, `face`, `side_addressed`, `cis_id`, `cis_version`, `cis_id_ref`, `cis_version_ref` or `cis_port_id_ref`. Parameters change where a product's ports are, never which standards it conforms to or on which faces. This keeps §2.3 and §5.7 intact for every size.
+
+**Price.** A product priced by a published rate binds `pricing.base_msrp` to an expression such as `round(volume_cf * unit_rate_usd_per_cf, 2)`. A product priced by quote leaves the rate `null`; the resolved price is then `null` and the configuration is reported as not fully priced (§4.8).
+
+#### 5.8.6 Expression language
+
+Small on purpose: enough for rectangular geometry, weights, quantities and prices, and not enough to write a program.
+
+```text
+expr    := or
+or      := and ('or' and)*
+and     := not ('and' not)*
+not     := 'not' not | cmp
+cmp     := sum (('<' | '<=' | '>' | '>=' | '==' | '!=') sum)?
+sum     := term (('+' | '-') term)*
+term    := unary (('*' | '/') unary)*
+unary   := '-' unary | primary
+primary := NUMBER | 'null' | 'true' | 'false' | NAME
+         | FUNC '(' expr (',' expr)* ')' | '(' expr ')'
+FUNC    := 'min' | 'max' | 'abs' | 'floor' | 'ceil' | 'round'
+```
+
+- `NUMBER` is one or more digits, optionally followed by `.` and more digits. There is no sign or exponent; write `-` as unary minus. `NAME` is a letter or `_` followed by letters, digits or `_`, and MUST be a name defined earlier in the block (P3).
+- `min` and `max` take one or more arguments; `abs`, `floor` and `ceil` take one; `round` takes one or two, the second a whole number from 0 to 10.
+- Arithmetic is IEEE 754 double precision. Division by zero is an evaluation error, and the parser MUST reject the size.
+- `round(x, n)` returns the number with `n` decimal places (default 0) nearest to the exact value of `x`, taking the one farther from zero when `x` is exactly halfway. For example, `round(5.90625, 4)` is `5.9063`. Half-to-even rounding, the default in many languages, does not conform.
+- Two numbers that differ by no more than 1e-9 compare as equal: `a < b` is true only when `b − a > 1e-9`, and `a <= b` when `a − b ≤ 1e-9`. `>`, `>=`, `==` and `!=` follow the same rule.
+- `true` and `false` may appear only as operands of `and`, `or` and `not`. Using them in arithmetic or in `<`, `<=`, `>`, `>=` makes the file invalid (P3).
+- Any operation with a `null` operand yields `null`.
+- Implementations MUST NOT evaluate expressions with a host-language `eval`.
+
+#### 5.8.7 Resolution and configured items
+
+To **resolve** a parametric product at chosen parameter values, a parser:
+
+1. rejects any value whose name is not an input (§7.10, V1), and fills any parameter not supplied with its `default`;
+2. rejects any value outside its limits or off its step (V2 and V3). A value is on the step grid when `(value − min) / step` is within 1e-9 of a whole number;
+3. evaluates `derived` in order;
+4. evaluates `rules`, and rejects the size if any `error` rule is false (V4);
+5. copies the element, writes every binding, applies `label_template`, and removes `parameters`.
+
+The result is an ordinary fixed-size element file. Software that only receives resolved files, such as a factory's production system, does not need to understand parameters. A resolved file that uses no other feature introduced after v0.2.0 SHOULD declare `cto_version` `0.2.0`, so that v0.2.0 parsers read it without a version warning (§8.2).
+
+A **configured item key** identifies a configured item. It is the product id, `@`, the product version, `?`, then every input as `name=value`, sorted by name in Unicode code point order and joined by `&`:
+
+```text
+example-plywood-wall-panel-5l@0.1.0?height_in=120&width_in=94
+example-plywood-wall-panel-5l@0.1.0?height_in=120&width_in=94.0625
+```
+
+Values in the key and in `label_template` are written as the shortest decimal that reads back as the same double, with no exponent, no trailing zeros and no trailing decimal point: `94`, `94.0625`, `0.5`. A `null` value is written `null`. Every input appears, including those left at their defaults, so one configured item has exactly one key.
+
+Wherever a configured item is recorded (`parameter_values` on placed instances, pricing line items, production slots and load manifests), every input is written out, including those at their defaults. A later product version that changes a default then cannot change the size of an item already configured.
+
+The key is how a configured item is identified on pricing line items (§4.8), production slots and load manifests (§6.4), and in chain of custody.
+
+#### 5.8.8 Size-dependent fields
+
+Every field in the product schema that changes with size MUST be bound, or the product MUST be constrained by rules to a range over which the stated value holds. Fields not listed here are not normally size-dependent.
+
+| Field (§5.1) | Requirement for a parametric product |
+|---|---|
+| `geometry.nominal_dimensions` | MUST bind. Used for snapping, spatial reservation and collision detection (§7.5) |
+| `geometry.bounding_box` extents **and** `min`/`max` | MUST bind both. They state each extent twice and MUST agree |
+| `geometry.bounding_box.weight_lbs` | MUST bind. Drives rigging, load manifests and crane lift plans (§6.4) |
+| `geometry.center_of_gravity` | MUST bind. Drives rigging |
+| `geometry.opening_geometry` | Offsets SHOULD be bound where the opening should stay centred or right-anchored (§5.4) |
+| `geometry.clearance_zones` | MUST bind zones on faces that move |
+| `geometry.chase_zones` | Normally fixed (depth and side do not change with size) |
+| `geometry.model_glb_url` | A mesh shows one size. Configurators MUST NOT stretch it non-uniformly, which distorts openings and fixtures. Manufacturers SHOULD supply geometry that can be generated from the resolved dimensions, or a reference-size model labelled as such |
+| `connectivity.connection_points[].position_ft` | MUST bind points on faces that move. Points on the origin faces need no binding |
+| `connectivity.interface_roles`, `declares_interface` | Protected; MUST NOT change (§5.8.5) |
+| `structural_performance.load_capacity`, `deflection_limit` | Capacity usually falls as span grows. MUST be bound, or rules MUST limit sizes to the range where the stated capacity holds |
+| `structural_performance.foundation_requirements.point_loads` | MUST bind positions and loads |
+| `thermal_performance` | Per-area values are normally fixed |
+| `certifications` | Not bindable. Listings and approvals MUST cover the full declared range (§2.3) |
+| `constraints` | Review `min_adjacent_width_ft`, `max_cantilever_ft` and similar for size dependence |
+| `rigging.lift_points`, `min_spreader_length_ft` | MUST bind positions; capacities MUST hold at the largest size |
+| `installation.estimated_installation_hours` | MAY bind |
+| `options[].msrp_add`, `affects_weight_lbs` | MAY bind where an option is priced by area or length |
+| `pricing.base_msrp` | MUST bind, or the product is priced by quote (§5.8.5) |
+
+#### 5.8.9 Out of scope
+
+- Non-rectangular shapes: raked, triangular (gable-end) or curved products.
+- Choice parameters (a finish, a grade). `options[]` already covers discrete choices.
+- Rules that read the assembly, for example a span limit that depends on the support spacing where the panel is placed. Rules see only the product's own parameters.
+- CIS port envelopes that change with member size, and connections that run continuously along an edge whose length changes. These belong to the CIS specification; a CIS change for them SHOULD reuse the expression language in §5.8.6.
 
 ---
 
@@ -2066,6 +2310,8 @@ The complete fulfillment plan integrates chain of custody with manufacturing, de
 }
 ```
 
+For a parametric product, each entry in `manufacturing_schedule.production_slots` and each `delivery_manifest.shipments[].load_manifest` entry MUST carry `parameter_values` and `configured_item_key` (§5.8.7). Without them the production order says *which* product to make but not *what size*. `weight_lbs`, `total_weight_lbs` and `crane_lift_plan.lift_operations[].weight_lbs` MUST be the configured item's resolved weight. Validators SHOULD check resolved dimensions and weights against `jobsite.access_constraints` (`max_truck_length_ft`, `max_truck_weight_lbs`).
+
 ---
 
 ## 7. Validation Rules
@@ -2081,6 +2327,7 @@ A conforming CTO parser MUST enforce the following validation rules. v0.2.0 adds
 - Every `level_id` in `floor_cartridges` and `placed_elements` MUST reference an entry in `floor_levels`
 - **NEW:** Every `cis_id` in `connectivity.interface_roles` MUST also appear in the file's top-level `declares_interface` block
 - **NEW:** Every `cis_port_id_ref` in `connectivity.connection_points` MUST reference a `port_id` defined in the corresponding CIS file at the declared version
+- Every instance of a parametric product MUST carry `parameter_values`, and every key in it MUST be an input of the referenced product (§5.8, §7.10)
 
 ### 7.2 Grid Consistency
 
@@ -2119,11 +2366,15 @@ A conforming CTO parser MUST enforce the following validation rules. v0.2.0 adds
 - Wall panels MUST touch an outer perimeter edge of the floor plate (interior placement is invalid)
 - Stairwell conceptual objects with `force_void_alignment: true` MUST be matched by floor cartridges with `opening_geometry` of type `void` at the same position
 
+For parametric products, every check in this section uses the configured item's *resolved* nominal dimensions and clearance zones, not the reference size.
+
 ### 7.6 Structural Performance
 
 - Total transmitted loads at each connection MUST NOT exceed the receiving element's capacity
 - Foundation point loads MUST NOT exceed bearing capacity
 - Seismic design category of all elements MUST be compatible with project SDC
+
+For parametric products, every check in this section uses resolved values. Where capacity depends on size, it MUST be enforced through rules (§5.8.4) or bound capacity values, so that an undersized or overspanned configured item cannot validate.
 
 ### 7.7 Thermal Performance
 
@@ -2152,6 +2403,33 @@ When `fulfillment_plan` is present:
 - `legal_status` MUST progress correctly: `goods` → `fixture` → `real_property`
 - All party blocks MUST conform to the Unified Party Schema (Section 4.3a)
 
+### 7.10 Parameter Validity
+
+**Element files** carrying `parameters` MUST satisfy:
+
+| Rule | Check |
+|------|-------|
+| P1 | Every input has all required fields; `min ≤ default ≤ max`; `step > 0`; `default` on the step grid. A `max` off the grid is allowed but SHOULD be reported, since it cannot be reached |
+| P2 | Names are unique across inputs, constants and derived values, and none is a keyword or function name. Constants are numbers or `null` |
+| P3 | Every derived value, rule and binding reads only names defined before it |
+| P4 | Every binding target exists, holds a number or `null`, is bound only once, and is not protected (§5.8.5) |
+| P5 | Reference size (§5.8.3): every binding, evaluated at the defaults, reproduces the value already in the file, within 1e-9 |
+| P6 | The reference size satisfies every `error` rule |
+| P7 | Every `{name}` in `label_template` is defined |
+| P8 | The file declares `cto_version` 0.3.0 or later, the first version to include §5.8 |
+
+**Placed instances** of parametric products MUST satisfy:
+
+| Rule | Check |
+|------|-------|
+| V1 | Every key in `parameter_values` is an input of the product |
+| V2 | Every value is within its limits |
+| V3 | Every value is on its step grid |
+| V4 | Every `error` rule holds at the instance's values |
+| V5 | The assembly or template file containing the instance declares `cto_version` 0.3.0 or later |
+
+All other validation in §7 then runs on the resolved product.
+
 ---
 
 ## 8. Versioning
@@ -2170,6 +2448,8 @@ Parsers MUST:
 - Accept files with a lower MINOR version (ignoring unknown fields)
 - Reject files with a higher MAJOR version
 
+Parsers SHOULD warn when opening a file with a higher MINOR version than they implement. A parser that does not implement parametric products (§5.8), for example, would ignore `parameter_values` and treat every parametric instance as its reference size, producing wrong geometry, weights and prices without an error. An assembly or template that places a parametric product therefore declares 0.3.0 or later (§7.10, V5), so that such a parser warns.
+
 ### 8.3 Migration
 
 When MAJOR version changes occur, CfOC will publish migration guides and, where possible, automated migration tools.
@@ -2183,6 +2463,8 @@ For migration from v0.1.6 to v0.2.0:
 - The `cto_version` field MUST be updated from `"0.1.6"` to `"0.2.0"`
 
 For files that do not migrate, v0.2.0 parsers SHOULD accept v0.1.6 element files in legacy mode, treating absent `declares_interface` blocks as a warning rather than an error.
+
+Parametric products (§5.8) need no change to existing files: fixed-size element files remain valid. A manufacturer replacing a family of fixed-size files with one parametric file SHOULD keep the old product ids available, as `deprecated` (§4.2), until assemblies that reference them have been migrated, and SHOULD publish the mapping from each old id to the new product id plus `parameter_values`.
 
 ### 8.4 Independent Versioning of Companion Specifications
 
@@ -2347,6 +2629,189 @@ The K01-UM file declares one CIS standard but two `interface_roles` entries (one
 
 A bath pod (B01-UM) by contrast would declare two CIS standards — `CfOC-ICC-1220` for its top face addressing building services, AND `LBS-INT-BATH-UTIL` for its bottom face addressing the utility pod beneath it — with one `interface_roles` entry per CIS.
 
+### 10.4 Parametric Element File
+
+A solid mass plywood wall panel cut to any rectangle up to a 142 in. × 576 in. billet on a 1/16 in. step, at one thickness (5.10 in.). The manufacturer, interface, rules and figures are synthetic; the thickness and billet limits follow a five-layer layup in a public evaluation report. Thickness is fixed, so each layup would be its own element file (§5.8.1).
+
+The file is shown at its reference size, the full billet, trimmed for length. It satisfies P1 to P8 (§7.10). The complete file, three resolved sizes, the interface it declares and test vectors for implementers are in [`examples/interoperability/parametric-plywood-wall-panel/`](../../examples/interoperability/parametric-plywood-wall-panel/).
+
+```json
+{
+  "cto_version": "0.3.0",
+  "cto_type": "element",
+  "element_meta": {
+    "id": "example-plywood-wall-panel-5l",
+    "name": "Example Mass Plywood Wall Panel, 5 layers (5.10 in.), cut to size",
+    "category": "wall_panel",
+    "subcategory": "solid",
+    "product_version": "0.1.0",
+    "status": "draft",
+    "manufacturer": {"name": "Example Panel Co.", "...": "..."}
+  },
+  "declares_interface": [
+    {
+      "cis_id": "EXAMPLE-INT-PLY-PLY",
+      "cis_version": "0.1.0",
+      "cis_registry_url": null,
+      "scope": "panel_to_panel",
+      "registry_scope": "catalog_internal"
+    }
+  ],
+  "parameters": {
+    "description": "One mass plywood panel layup, cut to any rectangle within the limits below. Thickness is fixed.",
+    "label_template": "Example Mass Plywood Wall Panel, 5 layers (5.10 in.), {width_in} in. x {height_in} in.",
+    "inputs": [
+      {
+        "name": "width_in",
+        "label": "Panel width",
+        "unit": "in",
+        "min": 12.0,
+        "max": 142.0,
+        "step": 0.0625,
+        "default": 142.0,
+        "description": "Across the panel, perpendicular to the strong axis."
+      },
+      {
+        "name": "height_in",
+        "label": "Panel height",
+        "unit": "in",
+        "min": 12.0,
+        "max": 576.0,
+        "step": 0.0625,
+        "default": 576.0,
+        "description": "Along the strong axis, which stands vertical in a wall."
+      }
+    ],
+    "constants": {
+      "thickness_in": 5.1,
+      "density_pcf": 35.0,
+      "legal_width_in": 102.0,
+      "max_slenderness": 20.0,
+      "unit_rate_usd_per_cf": 100.0
+    },
+    "derived": [
+      {"name": "width_ft", "expr": "width_in / 12"},
+      {"name": "height_ft", "expr": "height_in / 12"},
+      {"name": "thickness_ft", "expr": "thickness_in / 12"},
+      {"name": "area_sf", "expr": "width_ft * height_ft"},
+      {"name": "volume_cf", "expr": "area_sf * thickness_ft"},
+      {"name": "weight_lbs", "expr": "round(volume_cf * density_pcf)"},
+      {"name": "msrp_usd", "expr": "round(volume_cf * unit_rate_usd_per_cf, 2)"}
+    ],
+    "rules": [
+      {
+        "id": "R-SHIP-WIDTH",
+        "severity": "warning",
+        "expr": "min(width_in, height_in) <= legal_width_in",
+        "message": "Both dimensions exceed 8 ft 6 in., so the panel ships as an oversize load."
+      },
+      {
+        "id": "R-SLENDER",
+        "severity": "error",
+        "expr": "height_in <= max_slenderness * width_in",
+        "message": "The panel is more than 20 times taller than it is wide."
+      }
+    ],
+    "bindings": [
+      {"target": "/geometry/nominal_dimensions/width_ft", "expr": "round(width_ft, 4)"},
+      {"target": "/geometry/bounding_box/width_ft", "expr": "round(width_ft, 4)"},
+      {"target": "/geometry/bounding_box/height_ft", "expr": "round(height_ft, 4)"},
+      {"target": "/geometry/bounding_box/weight_lbs", "expr": "weight_lbs"},
+      {"target": "/geometry/bounding_box/max/x", "expr": "round(width_ft, 4)"},
+      {"target": "/geometry/bounding_box/max/y", "expr": "round(height_ft, 4)"},
+      {"target": "/geometry/center_of_gravity/x_ft", "expr": "round(width_ft / 2, 4)"},
+      {"target": "/geometry/center_of_gravity/y_ft", "expr": "round(height_ft / 2, 4)"},
+      {
+        "target": "/connectivity/connection_points/@cp-edge-left/position_ft/y",
+        "expr": "round(height_ft / 2, 4)"
+      },
+      {
+        "target": "/connectivity/connection_points/@cp-edge-right/position_ft/x",
+        "expr": "round(width_ft, 4)"
+      },
+      {
+        "target": "/connectivity/connection_points/@cp-edge-right/position_ft/y",
+        "expr": "round(height_ft / 2, 4)"
+      },
+      {"target": "/rigging/lift_points/@lp-1/position_ft/x", "expr": "round(width_ft / 4, 4)"},
+      {"target": "/rigging/lift_points/@lp-1/position_ft/y", "expr": "round(height_ft, 4)"},
+      {"target": "/rigging/lift_points/@lp-2/position_ft/x", "expr": "round(3 * width_ft / 4, 4)"},
+      {"target": "/rigging/lift_points/@lp-2/position_ft/y", "expr": "round(height_ft, 4)"},
+      {"target": "/pricing/base_msrp", "expr": "msrp_usd"}
+    ]
+  },
+  "catalog_reference": {"...": "..."},
+  "geometry": {
+    "nominal_dimensions": {"width_ft": 11.8333, "length_ft": 0.425},
+    "bounding_box": {
+      "width_ft": 11.8333,
+      "length_ft": 0.425,
+      "height_ft": 48,
+      "weight_lbs": 8449,
+      "min": {"x": 0, "y": 0, "z": 0},
+      "max": {"x": 11.8333, "y": 48, "z": 0.425}
+    },
+    "center_of_gravity": {"x_ft": 5.9167, "y_ft": 24, "z_ft": 0.2125}
+  },
+  "connectivity": {
+    "interface_roles": [
+      {
+        "cis_id": "EXAMPLE-INT-PLY-PLY",
+        "cis_version": "0.1.0",
+        "face": "right",
+        "side_addressed": "side_a"
+      },
+      {
+        "cis_id": "EXAMPLE-INT-PLY-PLY",
+        "cis_version": "0.1.0",
+        "face": "left",
+        "side_addressed": "side_b"
+      }
+    ],
+    "connection_points": [
+      {
+        "id": "cp-edge-left",
+        "face": "left",
+        "position_ft": {"x": 0, "y": 24, "z": 0.2125},
+        "cis_id_ref": "EXAMPLE-INT-PLY-PLY",
+        "cis_version_ref": "0.1.0",
+        "cis_port_id_ref": "edge_contact"
+      },
+      {
+        "id": "cp-edge-right",
+        "face": "right",
+        "position_ft": {"x": 11.8333, "y": 24, "z": 0.2125},
+        "cis_id_ref": "EXAMPLE-INT-PLY-PLY",
+        "cis_version_ref": "0.1.0",
+        "cis_port_id_ref": "edge_contact"
+      }
+    ]
+  },
+  "rigging": {
+    "lift_points": [
+      {"id": "lp-1", "position_ft": {"x": 2.9583, "y": 48, "z": 0.2125}, "capacity_lbs": 6000},
+      {"id": "lp-2", "position_ft": {"x": 8.875, "y": 48, "z": 0.2125}, "capacity_lbs": 6000}
+    ],
+    "spreader_bar_required": false
+  },
+  "pricing": {"base_msrp": 24140, "lead_time_days": 28}
+}
+```
+
+Placed with `parameter_values: { "width_in": 94, "height_in": 120 }`, it resolves to:
+
+| Field | Reference size | Configured item |
+|---|---|---|
+| `nominal_dimensions.width_ft` | 11.8333 | 7.8333 |
+| `bounding_box.height_ft` | 48 | 10 |
+| `bounding_box.weight_lbs` | 8449 | 1165 |
+| `cp-edge-right` position (x, y) | (11.8333, 24) | (7.8333, 5) |
+| `lp-2` position (x) | 8.875 | 5.875 |
+| `pricing.base_msrp` | 24140 | 3329.17 |
+| configured item key | — | `example-plywood-wall-panel-5l@0.1.0?height_in=120&width_in=94` |
+
+The `R-SHIP-WIDTH` warning fires at the reference size, because both dimensions of a full billet exceed 102 in., and clears at 94 in. wide. The left edge's connection point keeps x = 0 at every size because it sits on an origin face; the right edge's moves with the width.
+
 ---
 
 ## 11. Conformance
@@ -2361,6 +2826,8 @@ A bath pod (B01-UM) by contrast would declare two CIS standards — `CfOC-ICC-12
 | **CTO Fulfillment System** | Can populate and execute `fulfillment_plan` section including chain of custody |
 
 As of v0.2.0, all conformance levels MUST also be capable of resolving and parsing CIS files referenced via `declares_interface`.
+
+A CTO Reader, CTO Writer and CTO Configurator MUST be able to resolve parametric products (§5.8.7) and apply §7.10. A CTO Fulfillment System MUST carry `parameter_values` and `configured_item_key` through production, delivery and chain of custody (§6.4).
 
 ### 11.2 Validation Suite
 
