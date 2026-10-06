@@ -12,9 +12,9 @@ Closes #
 
 ## Checklist
 
-- [ ] My organization and I are listed for the CTO Specification Working Group in [MEMBERS.md](../blob/main/MEMBERS.md)
+- [ ] I agree that this pull request is a Contribution under the [Community Specification License 1.0](../blob/main/LICENSES/Community-Specification-License-1.0.md), limited to [Scope](../blob/main/Scope.md) (source code: Apache-2.0), and that I am authorized to contribute it for whoever owns it (Governance.md 6.0)
 - [ ] My organization owns this work or has the right to submit it. All known copyright owners: <!-- organization(s) or person(s) -->
-- [ ] Co-authors: <!-- @handles, each also listed in MEMBERS.md, or "none" -->
+- [ ] Co-authors: <!-- @handles, each agreeing to the same terms, or "none" -->
 - [ ] It contains no text copied from another standard, product document or other third-party source
 - [ ] It is within [Scope](../blob/main/Scope.md)
 - [ ] If it needs a matching change to the CIS specification, the linked pull request in cis-specification is: <!-- link, or "none" -->

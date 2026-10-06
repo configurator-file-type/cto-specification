@@ -4,8 +4,11 @@ This file is the member list of the CTO Specification Working Group. Under the P
 Member **Joins** a Working Group, and agrees to its Charter, by making a
 Contribution to it or by adding its name to the Working Group's member list.
 This Project asks every Member to add its name here **before** its first
-Contribution, so that there is a dated record and so that reviewers can check
-that a pull request comes from a Working Group Participant.
+Contribution, so that there is a dated record.
+
+You do not need to be listed here to contribute. Anyone who opens a pull
+request is a Participant and contributes under the Community Specification
+License (Governance.md 6.0).
 
 A "Member" is an organization or individual that has executed the Project's
 Membership Agreement, together with its Affiliates. One row per Member. List
@@ -35,7 +38,8 @@ listed in <https://github.com/configurator-file-type/cis-specification/blob/main
 ## Non-Members with a signed Non-Member Agreement
 
 Admitted by Approval of the Working Group Participants under Section 3 of the
-Working Group Charter.
+Working Group Charter, for participation beyond issues and pull requests, such
+as Working Group meetings (Governance.md 6.0).
 
 | Name | Organization | GitHub ID | Working Group | Date |
 | --- | --- | --- | --- | --- |

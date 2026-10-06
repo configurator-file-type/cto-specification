@@ -51,14 +51,31 @@ a direct and material interest.
    Each Working Group's Lead, listed in [`MAINTAINERS.md`](../MAINTAINERS.md),
    can add you to the invitation.
 
-You can read everything and ask questions right away. Step 3 comes before you
-propose any specification content, whether in a pull request or an issue.
+You can read everything and ask questions right away. Read Step 3 before you
+open your first pull request.
 
-## Step 3: Get cleared to contribute
+## Step 3: Know what you are agreeing to
 
-A pull request to a specification carries copyright and patent commitments from
-your organization. That is what makes the formats safe for everyone to
-implement. It also means there is paperwork, once per organization.
+Anyone can open a pull request; you do not need to be a Member or sign anything
+first. Opening one makes you a Participant in the Working Group and is your
+agreement that what you submit is a Contribution under the
+[Community Specification License 1.0](../LICENSES/Community-Specification-License-1.0.md),
+with copyright and patent commitments limited to [`Scope.md`](../Scope.md).
+That is what makes the formats safe for everyone to implement.
+
+1. **Make sure the work is yours to give.** If it belongs to your employer, you
+   must be authorized to contribute it for them. If they hold patents in this
+   area, show their IP counsel [`Scope.md`](../Scope.md) first: the commitment is
+   limited to the Scope, and the license allows 45 days after a Contribution to
+   exclude a patent claim.
+2. **Name every copyright owner** of what you submit in the pull request
+   template.
+
+### Optional: make your organization a Member
+
+Members hold the Working Group's roles (Maintainer, Editor, Working Group Lead)
+and vote when it cannot reach consensus. Membership is free, and the paperwork
+is once per organization.
 
 1. **Look for your organization in [`MEMBERS.md`](../MEMBERS.md).** If it is
    there, go to step 4 of this list.
@@ -78,9 +95,6 @@ implement. It also means there is paperwork, once per organization.
    To work on the CIS specification too, do the same in the
    [CIS repository](https://github.com/configurator-file-type/cis-specification/blob/main/MEMBERS.md). This is a good first pull request: it teaches
    the workflow and it is the record that you have Joined.
-
-Just want to comment on a draft without joining? Ask a Maintainer about the
-one-page Non-Member Agreement.
 
 ## Step 4: Make a first contribution
 
@@ -122,8 +136,8 @@ In the browser:
 - **Do not put specification text in Slack or email.** Put it in a pull request,
   from your own account. That is how it comes under the license.
 - **Do not paste in other people's text,** including text from another standard,
-  a product manual, or a colleague whose organization is not in `MEMBERS.md`. Name
-  every copyright owner of what you submit.
+  a product manual, or a colleague who is not named as a co-author. Name every
+  copyright owner of what you submit.
 - **Edit only the living spec file.** Changes go in `spec/cto/specification.md`.
   The version folders (`v0.2/`, `v0.3.0/` and
   so on) are frozen copies of published versions; leave them alone. A Maintainer

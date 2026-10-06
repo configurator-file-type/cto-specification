@@ -14,12 +14,32 @@ and adds the Project's own rules. Approval requirements are set in
 
 ## Before your first contribution
 
-Contributing here has legal effect. The Project is a series of Joint Development
-Foundation Projects, LLC, and only Members that have Joined a Working Group may
-participate in it. When you submit a pull request to a specification, your
-organization makes the copyright and patent commitments in the
-[Community Specification License 1.0](LICENSES/Community-Specification-License-1.0.md),
-limited to the [Scope](Scope.md) of that Working Group.
+**Anyone can contribute. You do not need to be a Member.** Contributing does
+have legal effect, so read this section first.
+
+When you open a pull request in this repository you become a Participant in the
+CTO Specification Working Group, and you agree that what you submit is a Contribution under
+the [Community Specification License 1.0](LICENSES/Community-Specification-License-1.0.md), limited
+to the [Scope](Scope.md) of this Working Group. Source code is under Apache-2.0
+(see [`LICENSE.md`](LICENSE.md)). The license carries copyright and patent
+commitments; they are what make the format safe for everyone to implement
+(Governance.md 6.0). There is nothing to sign first.
+
+1. **Read [`Scope.md`](Scope.md).** It is short. Work outside it does not belong
+   in this repository, and the patent commitment does not reach beyond it.
+2. **Make sure the work is yours to give.** If it belongs to your employer or
+   another organization, you must be authorized to contribute it on their
+   behalf. The pull request template asks you to name every copyright owner.
+3. **If your employer holds patents in this area,** tell whoever handles
+   intellectual property there before you contribute. The license gives a
+   Contributor 45 days from a Contribution to exclude a patent claim, by a notice
+   in [`Notices.md`](Notices.md).
+4. **Read the [Code of Conduct](CODE_OF_CONDUCT.md).**
+
+**Becoming a Member.** Membership is free, once per organization. Members hold
+the Maintainer, Editor and Working Group Lead roles, and vote when the Working
+Group cannot reach consensus (Governance.md 6.2). The Project is a series of
+Joint Development Foundation Projects, LLC.
 
 1. **Check whether your organization is already a Member.** Look in
    [`MEMBERS.md`](MEMBERS.md). Membership covers a Member's Affiliates. If your
@@ -37,24 +57,11 @@ limited to the [Scope](Scope.md) of that Working Group.
    [`MEMBERS.md`](MEMBERS.md). To work on the CIS specification as well,
    do the same in the [CIS repository](https://github.com/configurator-file-type/cis-specification/blob/main/MEMBERS.md). By doing so the Member
    agrees to that Working Group's Charter.
-4. **Read [`Scope.md`](Scope.md).** It is short. Work outside it does not belong
-   in this repository.
-5. **If your employer holds patents in this area,** tell whoever handles
-   intellectual property there before you contribute. The license gives a
-   Contributor 45 days from a Contribution to exclude a patent claim, by a notice
-   in [`Notices.md`](Notices.md).
 
-**Not a Member and not ready to be one?** You can still give feedback, once the
-Working Group Participants have Approved it and you have signed the short
-Non-Member Agreement (Appendix C of the Membership Agreement Package). Ask a
-Maintainer.
-
-**Issues from the public.** Anyone can read this repository, and anyone with a
-GitHub account can technically open an issue. Questions and error reports are
-welcome from anyone. Proposed specification content, such as suggested text,
-schema or designs, is accepted only from Working Group Participants and from
-Non-Members with a signed agreement. If you are neither, describe the problem
-you have and stop there. **[DECISION: confirm this line with JDF.]**
+**Issues are open to everyone.** Anyone with a GitHub account can open one. Questions, error
+reports, use cases and proposals are all welcome. Text, schema or designs
+suggested in an issue are not yet Contributions; they come under the license
+when their author submits them in a pull request (Governance.md 6.9).
 
 ## Issues
 
@@ -105,8 +112,8 @@ If you are not sure, call it normative.
    in the template. Name every co-author.
 7. Contribute only work your organization owns or has the right to submit, and
    name every known copyright owner in the pull request (Project Charter
-   Section 10). Do not paste in text written by someone who is not listed in
-   `MEMBERS.md`, and do not paste in text from another standard or a product
+   Section 10). Do not paste in text written by someone who is not named as a
+   co-author, and do not paste in text from another standard or a product
    document.
 
 ## Review

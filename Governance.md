@@ -73,15 +73,26 @@ Information disclosed in connection with any Working Group activity, including b
 
 ## 6. Project-Specific Provisions.
 
-**6.0. Who may participate.** Only Members that have Joined a Working Group
-participate in it (Working Group Charter, preamble). A Member is a party that has
-executed the Membership Agreement, with its Affiliates. New Members join on
-Approval of the Steering Committee, and the agreement takes effect when the
-Chairperson countersigns it. A Member Joins a Working Group by adding its name to
-that Working Group's list in [`MEMBERS.md`](MEMBERS.md), which this Project asks
-for before a first Contribution. A party that is not a Member may give feedback
-or participate only after Approval of the Working Group Participants and
-execution of the Non-Member Agreement (Working Group Charter, Section 3).
+**6.0. Who may participate.** Anyone may make a Contribution to this Working
+Group by opening a pull request in this repository. Project membership is not
+required. Opening a pull request makes the person who opens it a Participant
+(Section 1.3), and is their agreement that the Contribution is made under the
+Community Specification License 1.0, limited to the Scope in
+[`Scope.md`](Scope.md), or under Apache-2.0 for source code (see
+[`LICENSE.md`](LICENSE.md)), and to this document and the Code of Conduct. A
+person who contributes work owned by their employer or another organization
+confirms, by opening the pull request, that they are authorized to contribute it
+on that organization's behalf **[DECISION]**.
+
+A Member is a party that has executed the Membership Agreement, with its
+Affiliates. New Members join on Approval of the Steering Committee, and the
+agreement takes effect when the Chairperson countersigns it. A Member Joins a
+Working Group by adding its name to that Working Group's list in
+[`MEMBERS.md`](MEMBERS.md). Membership is not needed to open an issue or a pull
+request, to review one, or to object. Role holders under 6.2 are people from
+Members, and votes under 6.2(c) are cast one per Member **[DECISION]**.
+Attendance at Working Group meetings by a party that is not a Member follows
+Section 3 of the Working Group Charter (Non-Member Agreement) **[DECISION]**.
 
 **6.1. Working Groups and repositories.** Each Working Group develops its
 specification in its own repository:
@@ -190,7 +201,8 @@ under Section 14.
 proposed in Slack, email, a meeting or a shared document are not Contributions
 until the person who authored them, or a co-author who names them, submits them
 by pull request from their own GitHub account. No one submits material on behalf
-of a person or organization that is not listed in `MEMBERS.md`. Each pull request
+of another person or organization without their permission, and every co-author
+is named on the pull request. Each pull request
 discloses every known copyright owner of what it contributes (Project Charter
 Section 10).
 
