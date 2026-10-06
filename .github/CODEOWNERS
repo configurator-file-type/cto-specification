@@ -1,0 +1,26 @@
+# Review routing. See Governance.md 6.6 for who must approve what.
+#
+# [TBD] Replace the placeholders with GitHub teams, then uncomment. GitHub
+# rejects a CODEOWNERS file that names a team or user it cannot find, so these
+# lines stay commented until the teams exist.
+
+# CTO Working Group
+# /spec/cto/        @configurator-file-type/cto-editors
+# /schemas/cto/     @configurator-file-type/cto-editors
+# /examples/cto/    @configurator-file-type/cto-editors
+
+# Published version folders (read-only; Governance.md 6.10(c)). Only release
+# pull requests add files here, and they never change existing ones.
+# /spec/cto/v*/         @configurator-file-type/cto-editors @configurator-file-type/steering-committee
+
+# Governance files
+# /Scope.md             @configurator-file-type/steering-committee
+# /Governance.md        @configurator-file-type/steering-committee
+# /Notices.md           @configurator-file-type/steering-committee
+# /LICENSE.md           @configurator-file-type/steering-committee
+# /LICENSES/            @configurator-file-type/steering-committee
+# /CODE_OF_CONDUCT.md   @configurator-file-type/steering-committee
+# /CONTRIBUTING.md      @configurator-file-type/steering-committee
+# /MAINTAINERS.md       @configurator-file-type/steering-committee
+# /MEMBERS.md           @configurator-file-type/steering-committee
+# /.github/             @configurator-file-type/steering-committee

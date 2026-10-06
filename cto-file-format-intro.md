@@ -87,13 +87,13 @@ The CIS spec is at v0.1.3, having gone through three iterations during a single 
 
 ## Where to go next
 
-**Read the specs:** [CTO v0.2.0](spec/cto/v0.2/specification.md) | [CIS v0.1.3](spec/cis/v0.1/specification.md)
+**Read the specs:** [CTO](spec/cto/specification.md) | [CIS](https://github.com/configurator-file-type/cis-specification/blob/main/spec/cis/specification.md) (working drafts; published versions are listed in each repository's README)
 
-**See an example:** [CfOC-ICC-1220 v0.2.0 CIS file](examples/cis/CfOC-ICC-1220-v0.2.0.cis) — a fully-conformant CIS file documenting the core-utility handshake between modules and building services
+**See an example:** [CfOC-ICC-1220 v0.2.0 CIS file](https://github.com/configurator-file-type/cis-specification/blob/main/examples/cis/CfOC-ICC-1220-v0.2.0.cis) — a fully-conformant CIS file documenting the core-utility handshake between modules and building services
 
-**Track the version history:** [CHANGELOG.md](spec/CHANGELOG.md)
+**Track the version history:** [CTO CHANGELOG](spec/CHANGELOG.md) | [CIS CHANGELOG](https://github.com/configurator-file-type/cis-specification/blob/main/spec/CHANGELOG.md)
 
-**Contribute:** Issues and pull requests are welcome at the [GitHub repo](https://github.com/Jason-Van-Nest/configurator-file-type-spec). Please draft prose-first and JSON-second, per the v0.2.0 design principle.
+**Contribute:** Issues and pull requests are welcome at the [GitHub repo](https://github.com/configurator-file-type/cto-specification) (CIS issues: [cis-specification](https://github.com/configurator-file-type/cis-specification)). Please draft prose-first and JSON-second, per the v0.2.0 design principle.
 
 ---
 
