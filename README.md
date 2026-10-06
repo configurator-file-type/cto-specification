@@ -1,26 +1,30 @@
-# Configurator File Type Specification
+# CTO File Format Specification
 
-This repository hosts the open specifications for two related file formats used in Configure-to-Order (CTO) building configurators:
+This repository hosts the open specification for the **CTO file format** (`.cto` files): building configurations and product definitions for Configure-to-Order (CTO) building configurators. Its companion, the **CIS file format** (`.cis` files) for connection interface standards, is in [cis-specification](https://github.com/configurator-file-type/cis-specification).
 
-- **The CTO File Format Specification** (`.cto` files) — building configurations and product definitions
-- **The CIS File Format Specification** (`.cis` files) — connection interface standards
+The specification is developed by the **CTO Specification Working Group** of the **Configurator File Type Project**, a series of [Joint Development Foundation](https://www.jointdevelopment.org/) Projects, LLC (Linux Foundation). Membership is free and open to any party with a direct and material interest. The work originated at, and continues to be edited by, the [Center for Offsite Construction (CfOC) at NYIT](https://centerforoffsiteconstruction.org).
 
-Both specifications are released under the Apache 2.0 license and developed by the [Center for Offsite Construction (CfOC) at NYIT](https://centerforoffsiteconstruction.org).
+Specifications are licensed under the [Community Specification License 1.0](LICENSES/Community-Specification-License-1.0.md); source code is licensed under [Apache-2.0](LICENSES/Apache-2.0.txt). See [`LICENSE.md`](LICENSE.md).
+
+**New here?** Start with the [new contributor guide](docs/ONBOARDING.md).
 
 ---
 
-## Current versions
+## Current version
 
-| Specification | Current Version | Location |
+| Specification | Latest published version | Working draft (includes unreleased changes) |
 |---|---|---|
-| CTO File Format | **v0.2.0** | [`spec/cto/v0.2/specification.md`](spec/cto/v0.2/specification.md) |
-| CIS File Format | **v0.1.3** | [`spec/cis/v0.1/specification.md`](spec/cis/v0.1/specification.md) |
+| CTO File Format | **v0.2.0**, [`spec/cto/v0.2/cto-specification-v0.2.0.md`](spec/cto/v0.2/cto-specification-v0.2.0.md) | [`spec/cto/specification.md`](spec/cto/specification.md) |
 
-Released: April 19, 2026. See [CHANGELOG.md](spec/CHANGELOG.md) for version history.
+Released: April 19, 2026. See [CHANGELOG.md](spec/CHANGELOG.md) for version history, including changes merged since the last release.
+
+Cite a published version, not the working draft. Each published version has a
+frozen copy in its own version folder and, from the next release on, a tagged
+[GitHub Release](https://github.com/configurator-file-type/cto-specification/releases).
 
 ---
 
-## What these specifications do
+## What this specification does
 
 ### The CTO file format (`.cto`)
 
@@ -37,19 +41,9 @@ A `.cto` file:
 
 Four `.cto` file subtypes are defined: `assembly` (a complete or partial building configuration), `element` (a single product definition such as a kitchen pod), `template` (a pre-validated assembly used as a starting point), and `entourage` (non-structural visual elements like furniture layouts).
 
-### The CIS file format (`.cis`)
+### The companion CIS file format
 
-The CIS file format is the companion specification to CTO. CIS files document **connection interface standards** as machine-readable artifacts — including connection plane sides, port geometry, port connection signatures, utility requirements, and structural handshakes.
-
-A `.cis` file:
-
-- Defines the two sides of a connection plane (e.g., `dwelling_unit_side` / `building_services_side`)
-- Specifies port positions, tolerances, and connection signatures within each side
-- Describes utility requirements (pipe specs, ASTM standards, pressure ranges) at each port
-- Documents structural handshakes (bolts, alignment pins, load transfer)
-- Distinguishes open standards (publicly registered) from proprietary catalog-internal standards
-
-A `.cto` element file declares conformance to one or more `.cis` files via the `declares_interface` block. The CIS file is the source of truth for connection-plane specifics; the CTO file is the source of truth for product-specific geometry, lifecycle, and the rotation-lock binding between product faces and CIS sides.
+CTO element files declare conformance to connection interface standards written in the CIS file format (`.cis`). The CIS specification is developed by the CIS Specification Working Group in its own repository: <https://github.com/configurator-file-type/cis-specification>.
 
 ---
 
@@ -68,42 +62,46 @@ Splitting connection interface definitions into a separate `.cis` file format so
 ## Repository structure
 
 ```
-configurator-file-type-spec/
-├── README.md                              ← this file
-├── CONTRIBUTING.md                        ← how to contribute
-├── LICENSE                                ← Apache 2.0
-├── cto-file-format-intro.md               ← prose introduction to CTO
-├── web-content-cto-file-format.md         ← FoD&D website content
+cto-specification/
+├── README.md                     ← this file
+├── Scope.md                      ← what this Working Group covers (sets patent scope)
+├── Governance.md                 ← roles, decisions, approvals
+├── CONTRIBUTING.md               ← the contribution rules
+├── MAINTAINERS.md                ← who holds which role
+├── MEMBERS.md                    ← Project Members and who has Joined this Working Group
+├── Notices.md                    ← conduct contacts, license acceptances, exclusions
+├── CODE_OF_CONDUCT.md
+├── LICENSE.md                    ← which license applies to what
+├── LICENSES/                     ← full license texts
+├── docs/
+│   └── ONBOARDING.md             ← new contributor guide
+├── cto-file-format-intro.md      ← prose introduction to CTO (and CIS)
+├── web-content-cto-file-format.md
 ├── spec/
-│   ├── CHANGELOG.md                       ← version history (both specs)
-│   ├── cto/
-│   │   ├── v0.1/specification.md          ← CTO v0.1.6 (preserved)
-│   │   └── v0.2/specification.md          ← CTO v0.2.0 (current)
-│   └── cis/
-│       ├── v0.1/specification.md          ← CIS v0.1.3 (current)
-│       └── history/                       ← intermediate drafts
-│           ├── v0.1.0/specification.md
-│           ├── v0.1.1/specification.md
-│           └── v0.1.2/specification.md
-└── examples/
-    └── cis/
-        └── CfOC-ICC-1220-v0.2.0.cis      ← first example CIS file
+│   ├── README.md                 ← how the spec files are organized
+│   ├── CHANGELOG.md              ← version history, with an "Unreleased" section
+│   └── cto/
+│       ├── specification.md                        ← working draft: every PR edits this
+│       ├── v0.1/specification.md                   ← published: CTO v0.1.6 (frozen)
+│       ├── v0.2/cto-specification-v0.2.0.md        ← published: CTO v0.2.0 (frozen, latest)
+│       └── v0.3.0/ …                               ← created at the next release
+└── examples/                     ← example .cto files and interoperability fixtures
 ```
 
-The CTO and CIS specs live as siblings under `spec/`. Each spec uses per-MAJOR-version subfolders (`v0.1/`, `v0.2/`) holding the latest patch release of that minor version. Pre-release CIS drafts (v0.1.0 through v0.1.2) are preserved in `spec/cis/history/` as a historical artifact of the design conversation that produced v0.1.3.
+The specification has one living file, `spec/cto/specification.md`. Every change is a pull request against that file, so reviewers see exactly what changed. When the Working Group approves a new version, a Maintainer copies the living file into a new folder named for the full version (for example `spec/cto/v0.3.0/`), tags that commit (`cto-v0.3.0`) and creates a GitHub Release. Version folders, tags and Releases are never edited afterwards. See [`spec/README.md`](spec/README.md).
 
 ---
 
 ## Getting started
 
 **If you're a software developer building a CTO parser or configurator:**
-Start with the CTO spec ([`spec/cto/v0.2/specification.md`](spec/cto/v0.2/specification.md)). Read §1.6 for the relationship to CIS, then §3-§7 for the schema and validation rules. The CIS spec ([`spec/cis/v0.1/specification.md`](spec/cis/v0.1/specification.md)) is normative for any CIS files referenced by CTO files; conformant parsers must be able to parse them.
-
-**If you're a standards engineer authoring a connection standard:**
-Read the CIS spec ([`spec/cis/v0.1/specification.md`](spec/cis/v0.1/specification.md)) end-to-end. The CIS spec §15 explains the relationship to CTO files. The example file at [`examples/cis/CfOC-ICC-1220-v0.2.0.cis`](examples/cis/CfOC-ICC-1220-v0.2.0.cis) is the canonical reference for what a fully-conformant CIS file looks like.
+Start with the CTO spec ([`spec/cto/specification.md`](spec/cto/specification.md)). Read §1.6 for the relationship to CIS, then §3-§7 for the schema and validation rules. The CIS spec, in the [CIS repository](https://github.com/configurator-file-type/cis-specification), is normative for any CIS files referenced by CTO files; conformant parsers must be able to parse them.
 
 **If you're a manufacturer authoring an element file (a `.cto` file with `cto_type: "element"`):**
-Read CTO spec §4.1a (cto_type), §4.2 (element_meta), §4.2a (declares_interface), and §5 (Product Library Schema). Then read CIS spec §15 (Relationship to the CTO File Format) for the division of labor between the two file types.
+Read CTO spec §4.1a (cto_type), §4.2 (element_meta), §4.2a (declares_interface), and §5 (Product Library Schema). Then read CIS spec §15 (Relationship to the CTO File Format), in the [CIS repository](https://github.com/configurator-file-type/cis-specification), for the division of labor between the two file types.
+
+**If you're a standards engineer authoring a connection standard:**
+Go to the [CIS repository](https://github.com/configurator-file-type/cis-specification).
 
 **If you're a decision-maker (manufacturer leadership, AHJ, building official) evaluating these formats for adoption:**
 Read [`cto-file-format-intro.md`](cto-file-format-intro.md) for a prose overview that does not require parsing JSON schemas. Then skim CTO spec §1 and §2 (Introduction and Design Principles).
@@ -122,18 +120,21 @@ This principle applies to contributions: when proposing changes to either spec, 
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution process. Issues and pull requests are welcome at:
-https://github.com/Jason-Van-Nest/configurator-file-type-spec
+Issues and pull requests about the CTO specification are welcome in this repository: <https://github.com/configurator-file-type/cto-specification>. Issues about the CIS specification belong in <https://github.com/configurator-file-type/cis-specification>. Earlier copies of these repositories hosted elsewhere are no longer the place to contribute.
+
+Read the [new contributor guide](docs/ONBOARDING.md) first, then [`CONTRIBUTING.md`](CONTRIBUTING.md). Contributions to the specification carry the copyright and patent commitments of the Community Specification License, within the [Scope](Scope.md) of the CTO Specification Working Group.
 
 ---
 
 ## License
 
-Both specifications are released under the [Apache License 2.0](LICENSE). Implementations may be commercially proprietary or open source; the specifications themselves are open.
+Specifications: [Community Specification License 1.0](LICENSES/Community-Specification-License-1.0.md). Source code: [Apache License 2.0](LICENSES/Apache-2.0.txt). Details, and the warranty disclaimer that applies to everything here, are in [`LICENSE.md`](LICENSE.md). Implementations may be commercially proprietary or open source; the specifications themselves are open and royalty-free.
 
 ---
 
 ## Editors and contributors
+
+Current role holders under the Project's governance are listed in [`MAINTAINERS.md`](MAINTAINERS.md).
 
 **Editors:**
 - Jason Van Nest, Center for Offsite Construction
