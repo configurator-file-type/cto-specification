@@ -17,6 +17,18 @@ entries move under a new version heading.
 
 ## Unreleased
 
+### Added
+
+- **§5.8 Parametric Products**: an optional `parameters` block lets one element file describe every size of a product within limits the manufacturer sets: size parameters with limits and a default, each continuous or stepped, a reference size that keeps files readable by older parsers, rules for combinations, bindings that update every size-dependent field, a small expression language, resolution to a fixed-size element, and the configured item key (#4)
+- **§7.10 Parameter Validity**: rules P1 to P8 for element files and V1 to V5 for placed instances (#4)
+- **§10.4 Parametric Element File**: worked example, with the complete files and test vectors in `examples/interoperability/parametric-plywood-wall-panel/` (#4)
+- **§1.3 Terminology**: Parametric Product, Size Parameter, Reference Size, Configured Item (#4)
+
+### Changed
+
+- **§2.1 to §2.5, §3.4, §4.2, §4.4d to §4.8, §5.1, §5.4, §6.4, §7.1, §7.5, §7.6, §8.3, §11.1**: what each requirement means for a parametric product. `parameter_values` added to floor cartridge, placed element and roof element instances; `parameter_values` and `configured_item_key` added to pricing line items, production slots and load manifests (#4)
+- **§8.2 Compatibility**: parsers SHOULD warn when opening a file with a higher MINOR version than they implement (#4)
+
 ### Editorial
 
 - **Whole specification**: the sections that v0.2.0 incorporated by reference ("unchanged from v0.1.6") are now written out in full in the working draft, so the next published version is one complete document. No requirement changed.
