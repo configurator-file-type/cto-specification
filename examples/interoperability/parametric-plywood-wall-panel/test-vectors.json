@@ -243,8 +243,44 @@
       }
     },
     {
+      "id": "continuous-any-value",
+      "description": "height_in is continuous, so 120.03 in. is accepted although it is not on any 1/16 in. grid. The key and label carry the value as given.",
+      "parameter_values": {
+        "width_in": 94,
+        "height_in": 120.03
+      },
+      "expected": {
+        "result": "resolved",
+        "resolved_parameter_values": {
+          "width_in": 94,
+          "height_in": 120.03
+        },
+        "configured_item_key": "example-plywood-wall-panel-5l@0.1.0?height_in=120.03&width_in=94",
+        "element_meta.name": "Example Mass Plywood Wall Panel, 5 layers (5.10 in.), 94 in. x 120.03 in.",
+        "rule_findings": [],
+        "bindings": {
+          "/geometry/nominal_dimensions/width_ft": 7.8333,
+          "/geometry/bounding_box/width_ft": 7.8333,
+          "/geometry/bounding_box/height_ft": 10.0025,
+          "/geometry/bounding_box/weight_lbs": 1165,
+          "/geometry/bounding_box/max/x": 7.8333,
+          "/geometry/bounding_box/max/y": 10.0025,
+          "/geometry/center_of_gravity/x_ft": 3.9167,
+          "/geometry/center_of_gravity/y_ft": 5.0012,
+          "/connectivity/connection_points/@cp-edge-left/position_ft/y": 5.0012,
+          "/connectivity/connection_points/@cp-edge-right/position_ft/x": 7.8333,
+          "/connectivity/connection_points/@cp-edge-right/position_ft/y": 5.0012,
+          "/rigging/lift_points/@lp-1/position_ft/x": 1.9583,
+          "/rigging/lift_points/@lp-1/position_ft/y": 10.0025,
+          "/rigging/lift_points/@lp-2/position_ft/x": 5.875,
+          "/rigging/lift_points/@lp-2/position_ft/y": 10.0025,
+          "/pricing/base_msrp": 3330
+        }
+      }
+    },
+    {
       "id": "off-step",
-      "description": "94.03 in. is not on the 1/16 in. step from 12 in.",
+      "description": "width_in is stepped, so 94.03 in. is rejected: it is not on the 1/16 in. step from 12 in.",
       "parameter_values": {
         "width_in": 94.03,
         "height_in": 120

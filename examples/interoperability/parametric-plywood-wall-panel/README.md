@@ -13,7 +13,7 @@ analysis, a fabrication instruction, a price or an endorsement.
 **Where the numbers come from.** The thickness (5.10 in., five layers) and the
 largest billet (142 in. × 576 in.) follow a mass plywood layup (F16-5) listed in a
 public evaluation report, ICC-ES ESR-4760. Everything else is invented: the
-manufacturer, the interface, the 1/16 in. step and 12 in. minimums, the density,
+manufacturer, the interface, the 1/16 in. width step and 12 in. minimums, the density,
 both rules, the lift capacities, the lead time and the unit rate.
 
 ## Files
@@ -23,12 +23,15 @@ both rules, the lift capacities, the lead time and the unit rate.
 | `example-plywood-wall-panel-5l-v0.1.0.cto` | The parametric element, at its reference size (the full billet). Satisfies P1 to P8 |
 | `resolved/…-w94-h120.cto`, `…-w46-h96.cto`, `…-w142-h576.cto` | The same product resolved at three sizes (§5.8.7). Ordinary fixed-size elements that declare `cto_version` 0.2.0 |
 | `EXAMPLE-INT-PLY-PLY-v0.1.0.cis` | The synthetic, catalog-internal panel-edge interface the element declares on its left and right faces |
-| `test-vectors.json` | Ten cases: parameter values in, expected results out |
+| `test-vectors.json` | Eleven cases: parameter values in, expected results out |
 
 ## What it exercises
 
-- **Two size parameters**, `width_in` (product-local X) and `height_in` (Y, the
-  strong axis), each with limits, a 1/16 in. step and a default.
+- **Both kinds of size parameter.** `width_in` (product-local X) is *stepped*:
+  only values on a 1/16 in. increment from the minimum are valid.
+  `height_in` (Y, the strong axis) is *continuous*: any value within the limits
+  is valid. The `continuous-any-value` and `off-step` cases show the difference:
+  120.03 in. is accepted as a height and 94.03 in. is rejected as a width.
 - **A fixed thickness.** `thickness_in` is a constant, not an input. A different
   thickness is a different product (§5.8.1), and the `unknown-parameter` case
   checks that it is rejected.

@@ -42,9 +42,10 @@
         "unit": "in",
         "min": 12.0,
         "max": 142.0,
-        "step": 0.0625,
         "default": 142.0,
-        "description": "Across the panel, perpendicular to the strong axis. Product-local X. The maximum is the net width of the widest billet; the minimum is a synthetic handling limit."
+        "adjustment": "stepped",
+        "step": 0.0625,
+        "description": "Across the panel, perpendicular to the strong axis. Product-local X. Stepped: the panel is cut to width on a 1/16 in. increment. The maximum is the net width of the widest billet; the minimum is a synthetic handling limit."
       },
       {
         "name": "height_in",
@@ -52,9 +53,9 @@
         "unit": "in",
         "min": 12.0,
         "max": 576.0,
-        "step": 0.0625,
         "default": 576.0,
-        "description": "Along the strong axis, which stands vertical in a wall. Product-local Y. The maximum is the longest billet."
+        "adjustment": "continuous",
+        "description": "Along the strong axis, which stands vertical in a wall. Product-local Y. Continuous: any height within the limits. The maximum is the longest billet."
       }
     ],
     "constants": {

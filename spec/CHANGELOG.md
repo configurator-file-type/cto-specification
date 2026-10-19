@@ -19,7 +19,7 @@ entries move under a new version heading.
 
 ### Added
 
-- **§5.8 Parametric Products**: an optional `parameters` block lets one element file describe every size of a product within limits the manufacturer sets: size parameters with limits and step, a reference size that keeps files readable by older parsers, rules for combinations, bindings that update every size-dependent field, a small expression language, resolution to a fixed-size element, and the configured item key (#4)
+- **§5.8 Parametric Products**: an optional `parameters` block lets one element file describe every size of a product within limits the manufacturer sets: size parameters with limits and a default, each continuous or stepped, a reference size that keeps files readable by older parsers, rules for combinations, bindings that update every size-dependent field, a small expression language, resolution to a fixed-size element, and the configured item key (#4)
 - **§7.10 Parameter Validity**: rules P1 to P8 for element files and V1 to V5 for placed instances (#4)
 - **§10.4 Parametric Element File**: worked example, with the complete files and test vectors in `examples/interoperability/parametric-plywood-wall-panel/` (#4)
 - **§1.3 Terminology**: Parametric Product, Size Parameter, Reference Size, Configured Item (#4)

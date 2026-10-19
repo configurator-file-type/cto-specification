@@ -94,7 +94,7 @@ This specification covers:
 | **Product-Local Face Labels** | The labels `front`, `back`, `left`, `right`, `top`, `bottom` used in product geometry refer to faces of the product as oriented at SWB origin with no rotation. They are NOT real-world compass directions. A product placed in an assembly may be rotated such that its `front` face points west; the label `front` is preserved as a property of the product, not the placement |
 | **Connection Plane** (also see above) | Sides of a connection plane belong to the CIS file. A product's face *addresses* a side by reaching toward the plane from that side. See §5.7 and the CIS spec §2.2 |
 | **Parametric Product** | A catalog product whose size may be chosen within limits declared by the manufacturer, using a `parameters` block (§5.8). It is one product, with one `id`, at every permitted size |
-| **Size Parameter** | A named dimension of a parametric product that a designer may set, for example `width_in`, with a minimum, maximum, step and default (§5.8.2) |
+| **Size Parameter** | A named dimension of a parametric product that a designer may set, for example `width_in`, with a minimum, maximum and default, that is either continuous or stepped (§5.8.2) |
 | **Reference Size** | The size a parametric product has when every parameter is at its default. All literal values in a parametric element file describe the product at its reference size (§5.8.3) |
 | **Configured Item** | A parametric product at specific parameter values, identified by its configured item key (§5.8.7). The configured item, not the product, is what is priced, manufactured, shipped and tracked |
 
@@ -143,7 +143,7 @@ The CIS specification is normative for any CIS file referenced by a CTO file; co
 
 A CTO file does not describe arbitrary geometry. Every element in a configuration MUST reference a `product_id` that exists in a known catalog. The catalog — not the designer — defines what is possible. This is the foundational principle of Configure-to-Order: **design as purchasing, not drafting**.
 
-A parametric product (§5.8) remains catalog-constrained. The manufacturer declares which dimensions may change, the limits, and the step; the designer chooses only within them. A bounded, stepped range declared by the manufacturer is a catalog definition, in the same way `constraints.pitch_range` (§5.5) is.
+A parametric product (§5.8) remains catalog-constrained. The manufacturer declares which dimensions may change, the limits, and whether any value or only fixed increments are made; the designer chooses only within them. A bounded range declared by the manufacturer is a catalog definition, in the same way `constraints.pitch_range` (§5.5) is.
 
 ### 2.2 Cartridge-Driven Grids
 
@@ -1677,7 +1677,7 @@ Failures of rules 1–4 are validation errors. Failures of rule 5 (rotation mism
 
 Most offsite products are made at one size. Many are not. A mass timber panel is cut to any rectangle from a billet; a glulam beam is cut to length; a floor cartridge is shortened to dead-end against a stairwell (§4.4d). Without parameters, each size is a separate product: a mass plywood panel cut on a 1/16 in. step from a 142 in. × 576 in. billet would need about 18.8 million element files per layup.
 
-A **parametric product** is one element file that describes every permitted size. It does so with an optional `parameters` block, a top-level key in an element file. The block says which dimensions a designer may set, the limits and step the manufacturer will make, and how every value that depends on size is computed.
+A **parametric product** is one element file that describes every permitted size. It does so with an optional `parameters` block, a top-level key in an element file. The block says which dimensions a designer may set, the limits the manufacturer will make, whether each dimension takes any value or only fixed increments, and how every value that depends on size is computed.
 
 #### 5.8.1 What may be a parameter
 
@@ -1715,8 +1715,9 @@ A parser reads the block in order. Inputs and constants form an environment; eac
   "unit": "in",
   "min": 12.0,
   "max": 142.0,
-  "step": 0.0625,
   "default": 142.0,
+  "adjustment": "stepped",
+  "step": 0.0625,
   "description": "Across the panel, perpendicular to the strong axis. Product-local X."
 }
 ```
@@ -1727,9 +1728,28 @@ A parser reads the block in order. Inputs and constants form an environment; eac
 | `label` | string | Yes | Short label for a configurator's user interface |
 | `unit` | enum | Yes | `in`, `ft`, `mm`, `m`, `deg`, `count` |
 | `min`, `max` | number | Yes | Inclusive limits. These are the manufacturer's limits, and the range over which the product is represented as pre-validated (§2.3) |
-| `step` | number | Yes | Valid values are `min + k × step` for whole numbers k ≥ 0. States real manufacturing resolution, such as a CNC cut increment or a lamination count |
-| `default` | number | Yes | The reference size (§5.8.3). MUST lie within the limits and on the step |
+| `default` | number | Yes | The reference size (§5.8.3). MUST lie within the limits, and for a stepped input on the step |
+| `adjustment` | enum | Yes | `continuous`: any value from `min` to `max` is valid. `stepped`: only values `min + k × step`, for whole numbers k ≥ 0, are valid |
+| `step` | number | Conditional | Required when `adjustment` is `stepped` and MUST NOT appear when it is `continuous`. Greater than zero. States a real increment, such as a cabinet module, a lamination count or a stud spacing |
 | `description` | string | Yes | Which physical dimension this is, along which product-local axis, and why the limits are what they are (§2.8) |
+
+Two examples. A wall panel 5 ft tall by default that can be made any height from 4 ft to 6 ft:
+
+```json
+{ "name": "height_in", "label": "Panel height", "unit": "in",
+  "min": 48, "max": 72, "default": 60, "adjustment": "continuous",
+  "description": "Finished panel height. Product-local Y." }
+```
+
+An 18 in. countertop that extends in 3 in. increments to cover cabinet runs of 18, 21, 24 … 36 in.:
+
+```json
+{ "name": "length_in", "label": "Countertop length", "unit": "in",
+  "min": 18, "max": 36, "default": 18, "adjustment": "stepped", "step": 3,
+  "description": "Along the front edge. Product-local X. One increment per 3 in. cabinet module." }
+```
+
+A configurator SHOULD present a continuous input as a value the designer can drag or type, and a stepped input as one that moves up and down by `step`. A continuous input is still made to some tolerance; that tolerance belongs to the product's manufacturing data, not to the input.
 
 **`constants`**: an object of name → number or `null`, holding the product's fixed properties (thickness, density) and any rate not yet published. `null` propagates through expressions, so a file can carry a price formula before it carries a price.
 
@@ -1812,7 +1832,7 @@ FUNC    := 'min' | 'max' | 'abs' | 'floor' | 'ceil' | 'round'
 To **resolve** a parametric product at chosen parameter values, a parser:
 
 1. rejects any value whose name is not an input (§7.10, V1), and fills any parameter not supplied with its `default`;
-2. rejects any value outside its limits or off its step (V2 and V3). A value is on the step grid when `(value − min) / step` is within 1e-9 of a whole number;
+2. rejects any value outside its limits (V2), and any value of a stepped input that is off its step (V3). A value is on the step grid when `(value − min) / step` is within 1e-9 of a whole number;
 3. evaluates `derived` in order;
 4. evaluates `rules`, and rejects the size if any `error` rule is false (V4);
 5. copies the element, writes every binding, applies `label_template`, and removes `parameters`.
@@ -2409,7 +2429,7 @@ When `fulfillment_plan` is present:
 
 | Rule | Check |
 |------|-------|
-| P1 | Every input has all required fields; `min ≤ default ≤ max`; `step > 0`; `default` on the step grid. A `max` off the grid is allowed but SHOULD be reported, since it cannot be reached |
+| P1 | Every input has all required fields; `min ≤ default ≤ max`; `adjustment` is `continuous` or `stepped`; a stepped input has `step > 0` and its `default` on the step grid, and a continuous input has no `step`. A stepped `max` off the grid is allowed but SHOULD be reported, since it cannot be reached |
 | P2 | Names are unique across inputs, constants and derived values, and none is a keyword or function name. Constants are numbers or `null` |
 | P3 | Every derived value, rule and binding reads only names defined before it |
 | P4 | Every binding target exists, holds a number or `null`, is bound only once, and is not protected (§5.8.5) |
@@ -2424,7 +2444,7 @@ When `fulfillment_plan` is present:
 |------|-------|
 | V1 | Every key in `parameter_values` is an input of the product |
 | V2 | Every value is within its limits |
-| V3 | Every value is on its step grid |
+| V3 | Every value of a stepped input is on its step grid |
 | V4 | Every `error` rule holds at the instance's values |
 | V5 | The assembly or template file containing the instance declares `cto_version` 0.3.0 or later |
 
@@ -2631,7 +2651,7 @@ A bath pod (B01-UM) by contrast would declare two CIS standards — `CfOC-ICC-12
 
 ### 10.4 Parametric Element File
 
-A solid mass plywood wall panel cut to any rectangle up to a 142 in. × 576 in. billet on a 1/16 in. step, at one thickness (5.10 in.). The manufacturer, interface, rules and figures are synthetic; the thickness and billet limits follow a five-layer layup in a public evaluation report. Thickness is fixed, so each layup would be its own element file (§5.8.1).
+A solid mass plywood wall panel cut to any size up to a 142 in. × 576 in. billet, at one thickness (5.10 in.). Its width is stepped, in 1/16 in. increments; its height is continuous. The manufacturer, interface, rules and figures are synthetic; the thickness and billet limits follow a five-layer layup in a public evaluation report. Thickness is fixed, so each layup would be its own element file (§5.8.1).
 
 The file is shown at its reference size, the full billet, trimmed for length. It satisfies P1 to P8 (§7.10). The complete file, three resolved sizes, the interface it declares and test vectors for implementers are in [`examples/interoperability/parametric-plywood-wall-panel/`](../../examples/interoperability/parametric-plywood-wall-panel/).
 
@@ -2667,8 +2687,9 @@ The file is shown at its reference size, the full billet, trimmed for length. It
         "unit": "in",
         "min": 12.0,
         "max": 142.0,
-        "step": 0.0625,
         "default": 142.0,
+        "adjustment": "stepped",
+        "step": 0.0625,
         "description": "Across the panel, perpendicular to the strong axis."
       },
       {
@@ -2677,8 +2698,8 @@ The file is shown at its reference size, the full billet, trimmed for length. It
         "unit": "in",
         "min": 12.0,
         "max": 576.0,
-        "step": 0.0625,
         "default": 576.0,
+        "adjustment": "continuous",
         "description": "Along the strong axis, which stands vertical in a wall."
       }
     ],
