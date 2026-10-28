@@ -1,0 +1,72 @@
+{
+  "cis_format_version": "0.1.3",
+  "id": "EXAMPLE-INT-PLY-PLY",
+  "standard_version": "0.1.0",
+  "name": "Synthetic Plywood Panel Edge Interface (5.10 in. panel)",
+  "description": "Draft catalog-internal interface for the parametric-products fixture. It describes one 12 in. segment at the middle of a vertical panel edge, where two panels bear against each other. All dimensions and tolerances are synthetic; this is not a structural connection design. The real joint is continuous along an edge whose length changes with panel height, which CIS v0.1.3 cannot yet express (CTO spec §5.8.9).",
+  "publisher": {
+    "name": "Example Panel Co.",
+    "organization_type": "manufacturer",
+    "website": "https://example.com"
+  },
+  "published_date": "2026-10-06",
+  "status": "draft",
+  "registry_scope": "catalog_internal",
+  "registry_url": null,
+  "license": "Community-Spec-1.0",
+  "compatibility": {
+    "compatible_with": [
+      "0.1.0"
+    ],
+    "forward_compatible": false,
+    "description": "This synthetic fixture requires an exact interface-version match."
+  },
+  "sides": {
+    "side_a": {
+      "description": "Authoritative side: one panel edge at the joint. The plane is role-symmetric.",
+      "envelope": {
+        "nominal_width_in": 5.1,
+        "nominal_height_in": 12.0,
+        "clearance_depth_in": 2.0,
+        "description": "A 12 in. segment of the edge. X runs across the 5.10 in. panel thickness; Y runs along the edge."
+      },
+      "mirror_of": null
+    },
+    "side_b": {
+      "description": "The opposing panel edge, mirrored from side_a.",
+      "envelope": {
+        "nominal_width_in": 5.1,
+        "nominal_height_in": 12.0,
+        "clearance_depth_in": 2.0
+      },
+      "mirror_of": "side_a"
+    }
+  },
+  "ports": [
+    {
+      "port_id": "edge_contact",
+      "side": "side_a",
+      "position_in": {
+        "x": 2.55,
+        "y": 6.0
+      },
+      "tolerance_in": {
+        "x": 0.125,
+        "y": 0.25
+      },
+      "category": "structural",
+      "structural_connection_ref": "edge_bearing",
+      "connection_signature": "bearing_surface",
+      "required": true,
+      "description": "Centre of the segment, at mid-thickness. bearing_surface is same-to-same, so the mirrored side presents the same signature."
+    }
+  ],
+  "utility_connections": [],
+  "structural_connections": [
+    {
+      "structural_id": "edge_bearing",
+      "type": "bearing_surface",
+      "description": "Synthetic. Square-cut panel edges bearing on each other. No capacity is stated."
+    }
+  ]
+}
