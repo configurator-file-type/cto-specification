@@ -17,7 +17,9 @@ entries move under a new version heading.
 
 ## Unreleased
 
-_No changes yet._
+### Editorial
+
+- **Whole specification**: the sections that v0.2.0 incorporated by reference ("unchanged from v0.1.6") are now written out in full in the working draft, so the next published version is one complete document. No requirement changed.
 
 ---
 
