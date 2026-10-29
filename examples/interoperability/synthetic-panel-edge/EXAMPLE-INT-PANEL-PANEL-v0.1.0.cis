@@ -1,0 +1,66 @@
+{
+  "cis_format_version": "0.1.3",
+  "id": "EXAMPLE-INT-PANEL-PANEL",
+  "standard_version": "0.1.0",
+  "name": "Synthetic Panel-Edge Registration Interface",
+  "description": "Draft catalog-internal interface for testing whether independent configurators interpret the same panel-edge registration data consistently. All dimensions and tolerances are synthetic and are not a structural connection design.",
+  "publisher": {
+    "name": "Example Panel Publisher",
+    "organization_type": "manufacturer",
+    "website": "https://example.com"
+  },
+  "published_date": "2026-09-11",
+  "status": "draft",
+  "registry_scope": "catalog_internal",
+  "registry_url": null,
+  "license": "MIT",
+  "compatibility": {
+    "compatible_with": [
+      "0.1.0"
+    ],
+    "forward_compatible": false,
+    "description": "This synthetic fixture requires an exact interface-version match."
+  },
+  "sides": {
+    "side_a": {
+      "description": "Authoritative side of the synthetic panel-edge plane.",
+      "envelope": {
+        "nominal_width_in": 6.0,
+        "nominal_height_in": 96.0,
+        "clearance_depth_in": 2.0,
+        "description": "Synthetic registration envelope measured from its bottom-left corner."
+      },
+      "mirror_of": null
+    },
+    "side_b": {
+      "description": "Complementary mirrored side of the synthetic panel-edge plane.",
+      "envelope": {
+        "nominal_width_in": 6.0,
+        "nominal_height_in": 96.0,
+        "clearance_depth_in": 2.0,
+        "description": "Synthetic registration envelope measured from its bottom-left corner."
+      },
+      "mirror_of": "side_a"
+    }
+  },
+  "ports": [
+    {
+      "port_id": "alignment_center",
+      "side": "side_a",
+      "position_in": {
+        "x": 3.0,
+        "y": 48.0
+      },
+      "tolerance_in": {
+        "x": 0.125,
+        "y": 0.125
+      },
+      "category": "alignment",
+      "connection_signature": "alignment_pin_F",
+      "required": true,
+      "description": "Synthetic alignment location. The mirrored side receives the complementary alignment_pin_M signature under CIS v0.1.3 section 6.4."
+    }
+  ],
+  "utility_connections": [],
+  "structural_connections": []
+}

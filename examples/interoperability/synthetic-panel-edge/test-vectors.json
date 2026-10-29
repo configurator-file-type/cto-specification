@@ -1,0 +1,222 @@
+{
+  "fixture_format_version": "0.1.0",
+  "non_normative": true,
+  "description": "Implementation-neutral test vectors for the synthetic panel-edge CTO/CIS fixture. Result codes and observation fields are local to this example and are not part of either specification.",
+  "fixture_local_result_vocabulary": {
+    "scope": "fixture_only",
+    "normative": false,
+    "values": [
+      "pass",
+      "fail",
+      "indeterminate"
+    ]
+  },
+  "records": {
+    "product": {
+      "id": "example-solid-wall-panel",
+      "version": "0.1.0",
+      "path": "example-solid-wall-panel-v0.1.0.cto"
+    },
+    "interface": {
+      "id": "EXAMPLE-INT-PANEL-PANEL",
+      "version": "0.1.0",
+      "path": "EXAMPLE-INT-PANEL-PANEL-v0.1.0.cis"
+    }
+  },
+  "cases": [
+    {
+      "id": "opposite-sides-within-tolerance",
+      "description": "The right face of one panel addresses side_a and the left face of the other addresses side_b. Both resolve the same CIS version and the synthetic port offset is within tolerance.",
+      "proposed_pair": {
+        "first": {
+          "product_id": "example-solid-wall-panel",
+          "product_version": "0.1.0",
+          "face": "right",
+          "side_addressed": "side_a"
+        },
+        "second": {
+          "product_id": "example-solid-wall-panel",
+          "product_version": "0.1.0",
+          "face": "left",
+          "side_addressed": "side_b"
+        },
+        "cis_id": "EXAMPLE-INT-PANEL-PANEL",
+        "cis_version": "0.1.0",
+        "cis_available": true,
+        "port_offset_in": {
+          "x": 0.0,
+          "y": 0.0
+        }
+      },
+      "expected": {
+        "result": "pass",
+        "check_scope": [
+          "exact product and CIS references",
+          "complementary CIS sides",
+          "declared product faces",
+          "registered complementary signatures",
+          "port offset within tolerance"
+        ],
+        "issues": [],
+        "manufacturing_ready": false,
+        "note": "The scoped digital checks pass. The records remain synthetic drafts and establish no engineering or manufacturing approval."
+      }
+    },
+    {
+      "id": "same-side-pair",
+      "description": "Both proposed faces address side_a, so the products do not address opposite sides of the CIS plane.",
+      "proposed_pair": {
+        "first": {
+          "product_id": "example-solid-wall-panel",
+          "product_version": "0.1.0",
+          "face": "right",
+          "side_addressed": "side_a"
+        },
+        "second": {
+          "product_id": "example-solid-wall-panel",
+          "product_version": "0.1.0",
+          "face": "right",
+          "side_addressed": "side_a"
+        },
+        "cis_id": "EXAMPLE-INT-PANEL-PANEL",
+        "cis_version": "0.1.0",
+        "cis_available": true,
+        "port_offset_in": {
+          "x": 0.0,
+          "y": 0.0
+        }
+      },
+      "expected": {
+        "result": "fail",
+        "check_scope": [
+          "complementary CIS sides"
+        ],
+        "issues": [
+          {
+            "code": "FIXTURE_SAME_SIDE",
+            "severity": "error",
+            "message": "Both faces address side_a; complementary CIS sides are required."
+          }
+        ],
+        "manufacturing_ready": false
+      }
+    },
+    {
+      "id": "port-offset-outside-tolerance",
+      "description": "The required port is resolved, but its observed offset exceeds the CIS tolerance.",
+      "proposed_pair": {
+        "first": {
+          "product_id": "example-solid-wall-panel",
+          "product_version": "0.1.0",
+          "face": "right",
+          "side_addressed": "side_a"
+        },
+        "second": {
+          "product_id": "example-solid-wall-panel",
+          "product_version": "0.1.0",
+          "face": "left",
+          "side_addressed": "side_b"
+        },
+        "cis_id": "EXAMPLE-INT-PANEL-PANEL",
+        "cis_version": "0.1.0",
+        "cis_available": true,
+        "port_offset_in": {
+          "x": 0.25,
+          "y": 0.0
+        }
+      },
+      "expected": {
+        "result": "fail",
+        "check_scope": [
+          "port offset within tolerance"
+        ],
+        "issues": [
+          {
+            "code": "FIXTURE_PORT_TOLERANCE",
+            "severity": "error",
+            "message": "The 0.25 inch X offset exceeds the 0.125 inch CIS tolerance."
+          }
+        ],
+        "manufacturing_ready": false
+      }
+    },
+    {
+      "id": "missing-cis-record",
+      "description": "The product declares an interface, but the exact CIS record cannot be resolved.",
+      "proposed_pair": {
+        "first": {
+          "product_id": "example-solid-wall-panel",
+          "product_version": "0.1.0",
+          "face": "right",
+          "side_addressed": "side_a"
+        },
+        "second": {
+          "product_id": "example-solid-wall-panel",
+          "product_version": "0.1.0",
+          "face": "left",
+          "side_addressed": "side_b"
+        },
+        "cis_id": "EXAMPLE-INT-PANEL-PANEL",
+        "cis_version": "0.1.0",
+        "cis_available": false,
+        "port_offset_in": null
+      },
+      "expected": {
+        "result": "indeterminate",
+        "check_scope": [
+          "CIS resolution",
+          "signature compatibility",
+          "port alignment"
+        ],
+        "missing_facts": [
+          "EXAMPLE-INT-PANEL-PANEL@0.1.0"
+        ],
+        "issues": [
+          {
+            "code": "FIXTURE_CIS_UNAVAILABLE",
+            "severity": "indeterminate",
+            "message": "The exact CIS record is unavailable, so compatibility cannot be evaluated."
+          }
+        ],
+        "manufacturing_ready": false
+      }
+    },
+    {
+      "id": "undeclared-product-face",
+      "description": "The interface exists, but the proposal uses the front face even though the CTO element declares the interface only on its left and right faces.",
+      "proposed_pair": {
+        "first": {
+          "product_id": "example-solid-wall-panel",
+          "product_version": "0.1.0",
+          "face": "front",
+          "side_addressed": null
+        },
+        "second": {
+          "product_id": "example-solid-wall-panel",
+          "product_version": "0.1.0",
+          "face": "left",
+          "side_addressed": "side_b"
+        },
+        "cis_id": "EXAMPLE-INT-PANEL-PANEL",
+        "cis_version": "0.1.0",
+        "cis_available": true,
+        "port_offset_in": null
+      },
+      "expected": {
+        "result": "fail",
+        "check_scope": [
+          "declared product faces"
+        ],
+        "design_time_disposition": "warning",
+        "issues": [
+          {
+            "code": "FIXTURE_INTERFACE_ROLE",
+            "severity": "warning",
+            "message": "The front face does not declare EXAMPLE-INT-PANEL-PANEL. The exploratory design may be saved but cannot be exported as manufacturing-ready."
+          }
+        ],
+        "manufacturing_ready": false
+      }
+    }
+  ]
+}
