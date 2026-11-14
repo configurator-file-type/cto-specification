@@ -1,0 +1,196 @@
+{
+  "cto_version": "0.3.0",
+  "cto_type": "element",
+  "element_meta": {
+    "id": "example-adjustable-box-void",
+    "name": "Adjustable box with fixed void — abstract visualization fixture",
+    "category": "wall_panel",
+    "product_version": "0.1.0",
+    "status": "draft",
+    "created_at": "2026-11-14T05:49:33Z",
+    "modified_at": "2026-11-14T05:49:33Z",
+    "manufacturer": {
+      "name": "Example fixture author — fictional, not a manufacturer",
+      "website": "https://example.com",
+      "contact": {
+        "name": "Example fixture author",
+        "email": "fixture@example.com",
+        "role": "synthetic example maintainer"
+      }
+    },
+    "description": "A separate abstract box example containing one fixed source-declared subtractive void. The three outer dimensions remain configurable; no product, framing, material or manufacturer is represented.",
+    "notes": "wall_panel is an existing schema carrier, not a claim that this box is a wall product. Limits are invented test values, not engineering or manufacturer approvals. Source-local feet: X width, Y height, Z depth."
+  },
+  "declares_interface": [],
+  "catalog_reference": {
+    "manufacturer": "Example fixture author — fictional, not a manufacturer",
+    "manufacturer_website": "https://example.com",
+    "catalog_id": "example-box-visualization-fixtures",
+    "catalog_edition": "Non-normative visualization fixtures",
+    "catalog_version": "0.1.0",
+    "interface_standards": []
+  },
+  "parameters": {
+    "description": "The same three-axis abstract box, with a fixed 2 ft by 2 ft source-declared void starting 1 ft from the left and bottom. Containment rules reject outer dimensions that cannot contain the void.",
+    "label_template": "Abstract box with void — {width_ft} × {height_ft} × {depth_ft} ft",
+    "inputs": [
+      {
+        "name": "width_ft",
+        "label": "X · width",
+        "unit": "ft",
+        "min": 1,
+        "max": 12,
+        "default": 8,
+        "adjustment": "continuous",
+        "description": "Product-local positive X. Any finite width inside these invented visualization bounds."
+      },
+      {
+        "name": "height_ft",
+        "label": "Y · height",
+        "unit": "ft",
+        "min": 1,
+        "max": 10,
+        "default": 6,
+        "adjustment": "stepped",
+        "step": 0.5,
+        "description": "Product-local positive Y. Half-foot steps measured from the 1 ft minimum; invented visualization bounds."
+      },
+      {
+        "name": "depth_ft",
+        "label": "Z · depth",
+        "unit": "ft",
+        "min": 0.25,
+        "max": 4,
+        "default": 2,
+        "adjustment": "stepped",
+        "step": 0.25,
+        "description": "Product-local positive Z. Quarter-foot steps measured from the 0.25 ft minimum; invented visualization bounds."
+      }
+    ],
+    "constants": {
+      "opening_width_ft": 2,
+      "opening_height_ft": 2,
+      "opening_left_ft": 1,
+      "opening_bottom_ft": 1
+    },
+    "derived": [],
+    "rules": [
+      {
+        "id": "VOID-X-NONNEGATIVE",
+        "severity": "error",
+        "expr": "opening_left_ft >= 0",
+        "message": "The fixed void's left offset must not lie outside the box."
+      },
+      {
+        "id": "VOID-Y-NONNEGATIVE",
+        "severity": "error",
+        "expr": "opening_bottom_ft >= 0",
+        "message": "The fixed void's bottom offset must not lie below the box."
+      },
+      {
+        "id": "VOID-X-CONTAINMENT",
+        "severity": "error",
+        "expr": "opening_left_ft + opening_width_ft <= width_ft",
+        "message": "The selected width cannot contain the fixed void at its source-declared left offset."
+      },
+      {
+        "id": "VOID-Y-CONTAINMENT",
+        "severity": "error",
+        "expr": "opening_bottom_ft + opening_height_ft <= height_ft",
+        "message": "The selected height cannot contain the fixed void at its source-declared bottom offset."
+      }
+    ],
+    "bindings": [
+      {
+        "target": "/geometry/nominal_dimensions/width_ft",
+        "expr": "width_ft"
+      },
+      {
+        "target": "/geometry/nominal_dimensions/length_ft",
+        "expr": "depth_ft"
+      },
+      {
+        "target": "/geometry/bounding_box/width_ft",
+        "expr": "width_ft"
+      },
+      {
+        "target": "/geometry/bounding_box/height_ft",
+        "expr": "height_ft"
+      },
+      {
+        "target": "/geometry/bounding_box/length_ft",
+        "expr": "depth_ft"
+      },
+      {
+        "target": "/geometry/bounding_box/max/x",
+        "expr": "width_ft"
+      },
+      {
+        "target": "/geometry/bounding_box/max/y",
+        "expr": "height_ft"
+      },
+      {
+        "target": "/geometry/bounding_box/max/z",
+        "expr": "depth_ft"
+      },
+      {
+        "target": "/geometry/opening_geometry/width_ft",
+        "expr": "opening_width_ft"
+      },
+      {
+        "target": "/geometry/opening_geometry/height_ft",
+        "expr": "opening_height_ft"
+      },
+      {
+        "target": "/geometry/opening_geometry/offset_x_ft",
+        "expr": "opening_left_ft"
+      },
+      {
+        "target": "/geometry/opening_geometry/offset_z_ft",
+        "expr": "opening_bottom_ft"
+      }
+    ]
+  },
+  "geometry": {
+    "nominal_dimensions": {
+      "width_ft": 8,
+      "length_ft": 2,
+      "description": "Current X/Z footprint in feet; follows width and depth without changing the origin."
+    },
+    "bounding_box": {
+      "width_ft": 8,
+      "length_ft": 2,
+      "height_ft": 6,
+      "weight_lbs": null,
+      "min": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "max": {
+        "x": 8,
+        "y": 6,
+        "z": 2
+      },
+      "description": "Literal current extents at the reference inputs, in product-local feet: X width, Y height, Z depth. This is an abstract visualization envelope, not a physical shipping claim."
+    },
+    "chase_zones": [],
+    "opening_geometry": {
+      "type": "void",
+      "width_ft": 2,
+      "height_ft": 2,
+      "offset_x_ft": 1,
+      "offset_z_ft": 1,
+      "description": "A fixed rectangular through-depth void. In the pinned §5.4 contract, offset_z_ft is the bottom-edge/vertical-Y offset despite its legacy name; it is not the local Z/depth coordinate. The void passes through the box's entire configured depth."
+    },
+    "clearance_zones": [],
+    "model_glb_url": null
+  },
+  "connectivity": {
+    "interface_roles": [],
+    "connection_points": []
+  },
+  "constraints": {
+    "permitted_orientation": "vertical"
+  }
+}

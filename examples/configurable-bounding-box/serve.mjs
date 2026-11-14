@@ -1,0 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
+import http from 'node:http';import {readFile} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';
+const root=path.dirname(fileURLToPath(import.meta.url)),port=Number(process.env.PORT||3518),types={'.html':'text/html','.mjs':'text/javascript','.js':'text/javascript','.css':'text/css','.cto':'application/json','.json':'application/json','.png':'image/png','.mp4':'video/mp4'};
+http.createServer(async(req,res)=>{try{const u=new URL(req.url,'http://localhost'),p=path.resolve(root,'.'+decodeURIComponent(u.pathname==='/'?'/index.html':u.pathname));if(!p.startsWith(root+path.sep))throw Error('path');const bytes=await readFile(p);res.writeHead(200,{'content-type':types[path.extname(p)]||'application/octet-stream','cache-control':'no-store'});res.end(bytes);}catch{res.writeHead(404);res.end('Not found');}}).listen(port,'127.0.0.1',()=>console.log('CTO box example: http://127.0.0.1:'+port+'/'));

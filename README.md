@@ -8,6 +8,8 @@ Specifications are licensed under the [Community Specification License 1.0](LICE
 
 **New here?** Start with the [new contributor guide](docs/ONBOARDING.md).
 
+**Try a non-normative reference example:** [Configurable 3D bounding box](examples/configurable-bounding-box/README.md) — load a CTO, change its declared inputs and see its literal current bounds resize. This example illustrates a pinned experimental parameter profile; it does not change or release the specification.
+
 ---
 
 ## Current version
