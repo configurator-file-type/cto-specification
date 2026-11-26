@@ -1,6 +1,7 @@
 {
   "fixture_format_version": "0.1.0",
   "non_normative": true,
+  "architectural_coordinate_check": "z-up-view.json",
   "description": "Implementation-neutral test vectors for the synthetic panel-edge CTO/CIS fixture. Result codes and observation fields are local to this example and are not part of either specification.",
   "fixture_local_result_vocabulary": {
     "scope": "fixture_only",

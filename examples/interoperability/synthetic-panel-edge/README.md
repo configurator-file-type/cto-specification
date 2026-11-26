@@ -1,5 +1,19 @@
 # Synthetic panel-edge interoperability fixture
 
+## Start here: the panel with Z up
+
+In the architectural view, the panel stands **8 ft high along Z**, is **4 ft wide along X**, and is **6 in deep along Y**. The two alignment ports are halfway up the panel and halfway through its depth. Place a second panel 4 ft to the right: its left port meets the first panel's right port at **(4, 0.25, 4) ft**.
+
+Open [the Z-up example data](z-up-view.json) to compare the bounds, both ports, and an off-center test. The same points in the two frames are:
+
+| Point (feet, from the south-west-bottom corner) | Architectural XYZ: width, depth, height | CTO v0.2 product-local XYZ: width, height, depth |
+| --- | --- | --- |
+| Opposite corner | (4, 0.5, 8) | (4, 8, 0.5) |
+| Right port | (4, 0.25, 4) | (4, 4, 0.25) |
+| Left port | (0, 0.25, 4) | (0, 4, 0.25) |
+
+The example uses Z for height; the [CTO v0.2 exchange record](example-solid-wall-panel-v0.1.0.cto) still uses its specified product-local axes. To convert either way, keep width and exchange the depth and height slots: `(x,y,z) → (x,z,y)`. This reorders named measurements with positive depth; it is **not** a 3D rotation or a glTF transform. See the [CTO v0.2 geometry convention](../../../spec/cto/v0.2/cto-specification-v0.2.0.md).
+
 ## Status and scope
 
 This is a non-normative, independently authored synthetic fixture for testing parser and application behavior. It is not an adopted CfOC standard, a manufacturer product declaration, engineering analysis or approval, construction or fabrication instruction, commercial offer, or endorsement of any implementation.
@@ -15,6 +29,7 @@ The fixture intentionally contains no customer, project, company, or real-manufa
 | `example-solid-wall-panel-v0.1.0.cto` | One synthetic wall-panel element that declares the same panel-edge interface on its left and right faces. |
 | `EXAMPLE-INT-PANEL-PANEL-v0.1.0.cis` | A draft catalog-internal CIS with two complementary sides and one alignment port. |
 | `test-vectors.json` | Non-normative inputs and expected outcomes for two independent implementations. |
+| `z-up-view.json` | Expected architectural coordinates in feet, including an off-center mirrored pair. A comparison file, not a CTO/CIS record. |
 
 ## Interoperability target
 
@@ -30,13 +45,14 @@ The public repository is the review surface for the shared files. It is not a Re
 
 ## Fixture-local coordinate and derivation assumptions
 
-The CIS side-plane coordinates follow CIS v0.1.3 section 6.3: the origin is the bottom-left corner when facing the side, X points right, and Y points up. This fixture maps those coordinates onto the CTO product as follows:
+The CIS port is a **2D face measurement in inches**, not a 3D point. In [CIS v0.1.3 §§6.3–6.4](../../../spec/cis/v0.1/v0.1.3/cis-specification-v0.1.3.md), its fields are called `x` and `y`. Here we call them `u` (rightward) and `v` (upward) as you look at each face from outside. Do not rename the CIS fields. The origin is the bottom-left corner of the face being viewed.
 
-| CIS side-plane value | CTO product-local interpretation in this fixture |
+| Addressed face | Architectural XYZ in feet, from that panel's own origin |
 | --- | --- |
-| Side-plane X | Product-local Z across the six-inch panel edge when facing the addressed left or right face |
-| Side-plane Y | Product-local Y (vertical) |
-| Side-plane origin | Bottom-left corner of the addressed product face as viewed facing that face |
+| Right (side A) | `(4, u/12, v/12)` |
+| Left (side B) | `(0, (6-u)/12, v/12)` |
+
+**Check the direction, not just the center.** For the diagnostic point (1.5, 24) in on side A, CIS mirroring gives (4.5, 24) in on side B. The table then gives (4, 0.125, 2) ft on the first panel and (0, 0.125, 2) ft on the second. Translate the second panel by (+4, 0, 0) ft: the points coincide, with both 2 ft above the base. This deliberately asymmetric check catches a missing or double mirror that the centered port cannot reveal.
 
 This mapping is local to the fixture because CTO v0.2.0 and CIS v0.1.3 do not yet define a normative face-to-side coordinate transform.
 
@@ -72,4 +88,4 @@ The source CAD remains a source artifact. It is not automatically a public Regis
 
 ## Repository license note
 
-The CIS file uses `MIT` because the repository root `LICENSE` currently contains the MIT License. Other repository text refers to Apache 2.0. The maintainers should resolve that repository-level inconsistency before treating this example's license field as precedent.
+The draft CIS still declares `MIT`. The [upstream license policy](https://github.com/configurator-file-type/cto-specification/blob/main/LICENSE.md) distinguishes specification examples from source code. The Z-up example does not settle the fixture's classification or relicense it; maintainers should confirm the correct treatment before merge.
