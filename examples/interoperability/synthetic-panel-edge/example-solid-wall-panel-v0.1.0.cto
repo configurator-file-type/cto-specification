@@ -1,0 +1,125 @@
+{
+  "cto_version": "0.2.0",
+  "cto_type": "element",
+  "element_meta": {
+    "id": "example-solid-wall-panel",
+    "name": "Synthetic Solid Wall Panel",
+    "category": "wall_panel",
+    "subcategory": "solid",
+    "product_version": "0.1.0",
+    "status": "draft",
+    "created_at": "2026-09-11T00:00:00Z",
+    "modified_at": "2026-09-11T00:00:00Z",
+    "manufacturer": {
+      "name": "Example Panel Publisher",
+      "website": "https://example.com",
+      "contact": {
+        "name": "Fixture Maintainer",
+        "email": "maintainer@example.com",
+        "role": "synthetic example maintainer"
+      }
+    },
+    "description": "Independently authored synthetic wall-panel element for parser and interoperability testing. It does not reproduce a real product and carries no engineering, fabrication, commercial, or manufacturer approval."
+  },
+  "declares_interface": [
+    {
+      "cis_id": "EXAMPLE-INT-PANEL-PANEL",
+      "cis_version": "0.1.0",
+      "cis_registry_url": null,
+      "scope": "panel_to_panel",
+      "registry_scope": "catalog_internal",
+      "description": "The left and right faces use opposite sides of the synthetic panel-edge interface."
+    }
+  ],
+  "catalog_reference": {
+    "manufacturer": "Example Panel Publisher",
+    "manufacturer_website": "https://example.com",
+    "catalog_id": "example-synthetic-panel-catalog",
+    "catalog_edition": "Interoperability Fixture",
+    "catalog_version": "0.1.0",
+    "interface_standards": [
+      {
+        "standard_id": "EXAMPLE-INT-PANEL-PANEL",
+        "version": "0.1.0",
+        "scope": "panel_to_panel"
+      }
+    ]
+  },
+  "geometry": {
+    "nominal_dimensions": {
+      "width_ft": 4.0,
+      "length_ft": 0.5,
+      "description": "Synthetic configurator footprint. Width is positive X and depth is positive Z in product-local coordinates."
+    },
+    "bounding_box": {
+      "width_ft": 4.0,
+      "length_ft": 0.5,
+      "height_ft": 8.0,
+      "min": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "max": {
+        "x": 4.0,
+        "y": 8.0,
+        "z": 0.5
+      },
+      "description": "Synthetic physical shipping envelope as manufactured, expressed in product-local feet for this fixture."
+    },
+    "chase_zones": [],
+    "opening_geometry": null,
+    "clearance_zones": []
+  },
+  "connectivity": {
+    "interface_roles": [
+      {
+        "cis_id": "EXAMPLE-INT-PANEL-PANEL",
+        "cis_version": "0.1.0",
+        "cis_registry_url": null,
+        "face": "right",
+        "side_addressed": "side_a",
+        "description": "The product-local right face addresses side_a."
+      },
+      {
+        "cis_id": "EXAMPLE-INT-PANEL-PANEL",
+        "cis_version": "0.1.0",
+        "cis_registry_url": null,
+        "face": "left",
+        "side_addressed": "side_b",
+        "description": "The product-local left face addresses side_b."
+      }
+    ],
+    "connection_points": [
+      {
+        "id": "cp-right-alignment-center",
+        "face": "right",
+        "position_ft": {
+          "x": 4.0,
+          "y": 4.0,
+          "z": 0.25
+        },
+        "cis_id_ref": "EXAMPLE-INT-PANEL-PANEL",
+        "cis_version_ref": "0.1.0",
+        "cis_port_id_ref": "alignment_center",
+        "description": "Product-local reference to the synthetic CIS alignment port on the right face."
+      },
+      {
+        "id": "cp-left-alignment-center",
+        "face": "left",
+        "position_ft": {
+          "x": 0.0,
+          "y": 4.0,
+          "z": 0.25
+        },
+        "cis_id_ref": "EXAMPLE-INT-PANEL-PANEL",
+        "cis_version_ref": "0.1.0",
+        "cis_port_id_ref": "alignment_center",
+        "description": "Product-local reference to the synthetic CIS alignment port on the left face."
+      }
+    ]
+  },
+  "constraints": {
+    "permitted_orientation": "vertical"
+  }
+}

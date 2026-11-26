@@ -1,0 +1,22 @@
+{
+  "non_normative": true,
+  "product": "example-solid-wall-panel-v0.1.0.cto",
+  "interface": "EXAMPLE-INT-PANEL-PANEL-v0.1.0.cis",
+  "units": "ft",
+  "axes": ["width", "depth", "height"],
+  "origin": "south-west-bottom",
+  "bounds": {"min": [0, 0, 0], "max": [4, 0.5, 8]},
+  "ports": {
+    "cp-right-alignment-center": [4, 0.25, 4],
+    "cp-left-alignment-center": [0, 0.25, 4]
+  },
+  "off_center_check": {
+    "description": "Diagnostic only, not a second port on the product. Use the same viewer-facing convention on each edge.",
+    "side_a_right_uv_in": [1.5, 24],
+    "side_b_left_uv_in": [4.5, 24],
+    "right_xyz_ft": [4, 0.125, 2],
+    "left_xyz_ft": [0, 0.125, 2],
+    "second_panel_translation_ft": [4, 0, 0],
+    "coincident_xyz_ft": [4, 0.125, 2]
+  }
+}
